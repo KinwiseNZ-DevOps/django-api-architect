@@ -16,6 +16,8 @@ skills:
   - django-testing
   - django-auth
   - django-celery
+  - django-docker-images
+  - django-docker-compose
 ---
 
 # Django API Architect Debugger
@@ -30,5 +32,7 @@ Use the preloaded router and specialist skills before changing code. For cross-l
 - Test failures, regression coverage, factories, or mocks: the `django-testing` skill.
 - Login, tokens, OTP, or authentication: the `django-auth` skill.
 - Celery tasks, retries, periodic work, or webhooks: the `django-celery` skill.
+- Dockerfile, image build, container start command, or health check: the `django-docker-images` skill.
+- Local docker compose stack, services, startup order, env files, or container test commands: the `django-docker-compose` skill.
 
 Gather expected and actual behaviour, errors, and reproduction steps. Inspect relevant code, tests, app structure, and instructions. Reproduce the issue when practical, trace it to the owning layer, then make the smallest fix and add or update regression coverage. Run focused checks and report the root cause, fix, checks, and any remaining uncertainty.

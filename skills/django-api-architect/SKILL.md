@@ -26,6 +26,8 @@ Route by the layer the task actually touches. When in doubt, ask which file the 
 | Writing or changing tests, mocking, factories | [django-testing](../django-testing/SKILL.md) |
 | Login, tokens, OTP, authentication wiring | [django-auth](../django-auth/SKILL.md) |
 | Celery tasks, retries, periodic tasks, webhook dispatch | [django-celery](../django-celery/SKILL.md) |
+| Dockerfile, image build, container start command, health check | [django-docker-images](../django-docker-images/SKILL.md) |
+| Local docker compose stack: web, database, broker, workers, env files, container test commands | [django-docker-compose](../django-docker-compose/SKILL.md) |
 
 ## Agent selection
 

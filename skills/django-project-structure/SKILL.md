@@ -50,3 +50,4 @@ Theory source: the public Django Styleguide, https://github.com/HackSoftware/Dja
 
 - Code inside the files: [django-apis-serializers](../django-apis-serializers/SKILL.md), [django-services-selectors](../django-services-selectors/SKILL.md)
 - Environment and task wiring: [django-celery](../django-celery/SKILL.md)
+- Running the project in containers: [django-docker-images](../django-docker-images/SKILL.md), [django-docker-compose](../django-docker-compose/SKILL.md)

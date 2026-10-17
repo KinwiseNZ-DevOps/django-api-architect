@@ -17,6 +17,8 @@ Read the relevant skill before changing that layer. For cross-layer bugs, trace 
 - Test failures, regression coverage, factories, or mocks: the `django-testing` skill.
 - Login, tokens, OTP, or authentication: the `django-auth` skill.
 - Celery tasks, retries, periodic work, or webhooks: the `django-celery` skill.
+- Dockerfile, image build, container start command, or health check: the `django-docker-images` skill.
+- Local docker compose stack, services, startup order, env files, or container test commands: the `django-docker-compose` skill.
 
 ## Debugging process
 
