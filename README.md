@@ -14,9 +14,8 @@
 
 **Production-grade Django REST Framework API skills for AI coding agents, built around a service layer architecture.**
 
-[![Validate skills](https://img.shields.io/badge/ci-skills__tool__check-success)](.github/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Agent skills](https://img.shields.io/badge/agent_skills-8-8A2BE2)](https://agentskills.io)
+[![Agent skills](https://img.shields.io/badge/agent_skills-7-8A2BE2)](https://agentskills.io)
 [![Format](https://img.shields.io/badge/format-SKILL.md-orange)](https://agentskills.io/specification)
 [![Tooling](https://img.shields.io/badge/tooling-stdlib_only-success)](scripts/skills_tool.py)
 
@@ -39,7 +38,6 @@ Seven skills that let a coding agent build, review and extend Django REST API pr
 | [`django-project-structure`](skills/django-project-structure/SKILL.md) | Governs Django app layout, the app pack shape, app manifests, and settings organisation for service layer API projects. |
 | [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
 | [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
-| [`example-skill`](skills/example-skill/SKILL.md) | Placeholder skill demonstrating this repository's skill format: the gate, steps, hard rule phrasing and reference layout. |
 <!-- catalogue:end -->
 
 ## 🗺️ How they fit together
@@ -115,8 +113,6 @@ evals/cases.jsonl           3+ behavioural cases per skill
 scripts/skills_tool.py      validate, regenerate catalogue (stdlib only)
 .github/workflows/          CI runs `skills_tool.py check` (free on public repos)
 AGENTS.md                   agent-facing rules for this repo
-SETUP.md                    fill-in checklist; delete when done
-reference-content/          source material the skills are built from; delete when done
 ```
 
 </details>
@@ -124,8 +120,6 @@ reference-content/          source material the skills are built from; delete wh
 ## 📌 Status and limits
 
 > [!NOTE]
-> - 2026-10-17: setup scaffolding (`SETUP.md`, `reference-content/`, `templates/`, `skills/example-skill/`) still present, pending owner audit of the built skills.
-> - The CI badge above points at the workflow file locally; restore the standard actions badge URL with the real owner and repo name once the repository is pushed, because the owner's GitHub organisation name may not appear in published skills or README text (see `reference-content/strip-terms.txt`).
 > - The skills teach a primary architecture from an in-house Django API starter; projects with different structures win where they differ, and the router states that explicitly.
 > - Throttle rates, quotas and provider credentials are per project; the skills describe patterns, not values.
 > - Licensed under MIT (see [LICENSE](LICENSE)).

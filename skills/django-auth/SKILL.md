@@ -6,8 +6,7 @@ description: >
   Use when building or changing login, token refresh, logout, OTP
   request/verify flows, or authentication-related throttling. Do not use for
   general API permissions or throttle scopes outside auth
-  (django-apis-serializers), or for billing quotas (django-project-structure
-  and the subscriptions pack).
+  (django-apis-serializers).
 ---
 
 # Django Authentication
@@ -36,7 +35,7 @@ Stance: JWT via `rest_framework_simplejwt` is the primary flow for SPA clients; 
 
 - Wrap library auth views; add behaviour via serializer subclasses and view subclasses. Mechanism: hand-rolled token logic drifts from library security fixes; wrapping keeps upgrades safe.
 - Never store OTP codes in plaintext, and always consume them on use or on failed match. Mechanism: symptom is replayable or brute-forceable codes; cause is persistent plaintext codes; fix is hashed, TTL-bound, single-use storage with constant-time comparison.
-- Failed login must never trigger side effects (alerts, logs of attempts on the user's record beyond security logging). Mechanism: recording data on failed validation trusts unauthenticated input.
+- A failed login must never trigger side effects such as new-IP alerts or recording the IP on the user. Mechanism: symptom is attacker-supplied data stored on a real user's record, or alerts for attempts that never authenticated; cause is running the side effect before the credentials are verified; fix is hooking after `super().validate(attrs)` succeeds. Security logging of failed attempts is separate and allowed.
 - Login gets its own stricter anonymous throttle, separate from general API scopes. Mechanism: credential stuffing otherwise borrows the whole API's rate budget.
 
 ## References

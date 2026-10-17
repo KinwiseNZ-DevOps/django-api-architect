@@ -3,3 +3,4 @@ __pycache__/
 .DS_Store
 reference-content/raw/*
 !reference-content/raw/.gitkeep
+reference-content/
