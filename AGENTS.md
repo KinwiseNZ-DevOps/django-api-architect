@@ -34,7 +34,7 @@ Before reporting any change done, run:
 python scripts/skills_tool.py check
 ```
 
-Checks: frontmatter, name/folder match, description length and trigger, body under 500 lines, relative links resolve, at least 3 eval cases per skill, catalogue not stale, no em or en dashes in any file. It also fails on leftover `<placeholder>` text and on setup scaffolding (`SETUP.md`, `templates/`, `reference-content/`) in the tree.
+Checks: frontmatter, name/folder match, description length and trigger, body under 500 lines, every relative link resolves (including README.md and AGENTS.md), agent profile naming with no more than two profiles per host and exactly one `-workflow` main agent, at least 3 eval cases per skill, catalogue not stale, no project-specific terms from `reference-content/strip-terms.txt`, and no em or en dashes in file names or in any text outside `reference-content/`. It also fails on leftover `<placeholder>` text and on setup-only paths (`SETUP.md`, `templates/`, `reference-content/`) that are tracked by Git or not ignored.
 
 - The tool is necessary but not sufficient for content quality. For new or changed skill body text, also re-read the changed SKILL.md end to end. Reason: a validator checks structure; only reading checks that the instructions still make sense.
 
@@ -59,10 +59,6 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 ## Commit attribution
 
 - Do not add `Co-Authored-By` trailers for AI assistants to commit messages. Add co-author attribution only when the user explicitly requests it. Reason: commit trailers affect GitHub's contributor attribution.
-
-## Known deliberate states (dated)
-
-- None.
 
 ## Known deliberate states (dated)
 

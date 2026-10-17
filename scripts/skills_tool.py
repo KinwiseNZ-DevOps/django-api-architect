@@ -5,32 +5,50 @@
   python scripts/skills_tool.py catalogue    # rewrite README catalogue block
   python scripts/skills_tool.py check        # validate + fail if catalogue is stale
 
-Dashes are always checked (except in reference-content/, which holds raw source material). Ship checks (placeholders, leftover scaffolding)
-run once skills/example-skill has been deleted.
+Dashes are always checked in text files outside reference-content/, which holds raw source material. Ship checks for placeholders and setup-only paths in the Git index run once skills/example-skill has been deleted.
 """
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SKILLS = ROOT / "skills"
 README = ROOT / "README.md"
+AGENTS = ROOT / "AGENTS.md"
 EVALS = ROOT / "evals" / "cases.jsonl"
 AGENT_SOURCES = ROOT / "resources" / "agents"
 BEGIN, END = "<!-- catalogue:begin -->", "<!-- catalogue:end -->"
 BADGE_RE = re.compile(r"(badge/agent_skills-)(\d+|<N>)(-)")
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 LINK_RE = re.compile(r"\]\((?!https?://|#|mailto:)([^)\s]+)\)")
+ABSOLUTE_RE = re.compile(r"^([A-Za-z]:)?/")
 MAX_BODY_LINES, MAX_DESC, MAX_NAME, MIN_EVALS = 500, 1024, 64, 3
 BANNED_DASHES = (chr(0x2013), chr(0x2014))
 PLACEHOLDER_RE = re.compile(r"<([A-Za-z][^<>\n]*)>")
 HTML_TAGS = {"details", "summary", "div", "br", "p", "a", "img", "kbd", "sub", "sup"}
 PLACEHOLDER_FILES = ("README.md", "LICENSE", "AGENTS.md", "evals/cases.jsonl")
+TEXT_EXTENSIONS = {
+    ".md", ".txt", ".py", ".json", ".jsonl", ".yml", ".yaml", ".toml", ".cfg",
+    ".ini", ".sh", ".ps1", ".mjs", ".js", ".ts", ".html", ".css", ".license",
+}
+PRIVATE_PATHS = ("SETUP.md", "templates", "reference-content")
+
+
+def read_text(path):
+    for encoding in ("utf-8-sig", "utf-8"):
+        try:
+            return path.read_text(encoding=encoding)
+        except UnicodeDecodeError:
+            continue
+    return None
 
 
 def parse(path):
-    text = path.read_text(encoding="utf-8")
+    text = read_text(path)
+    if text is None:
+        return None, ""
     m = re.match(r"^---\n(.*?)\n---\n(.*)$", text, re.S)
     if not m:
         return None, text
@@ -50,6 +68,20 @@ def skill_dirs():
     if not SKILLS.is_dir():
         sys.exit("ERROR: skills/ directory not found")
     return sorted(p for p in SKILLS.iterdir() if p.is_dir())
+
+
+def link_errors(md):
+    text = read_text(md)
+    if text is None:
+        return []
+    errors = []
+    for target in LINK_RE.findall(text):
+        rel = target.split("#")[0]
+        if not rel or ABSOLUTE_RE.match(rel):
+            continue
+        if not (md.parent / rel).resolve().exists():
+            errors.append(f"{md.relative_to(ROOT)}: broken link {target}")
+    return errors
 
 
 def validate():
@@ -78,11 +110,11 @@ def validate():
         lines = len(body.splitlines())
         if lines > MAX_BODY_LINES:
             errors.append(f"{d.name}: body {lines} lines > {MAX_BODY_LINES}")
-        for md in [f, *d.rglob("references/*.md")]:
-            for target in LINK_RE.findall(md.read_text(encoding="utf-8")):
-                path = target.split("#")[0]
-                if path and not (md.parent / path).resolve().exists():
-                    errors.append(f"{md.relative_to(ROOT)}: broken link {target}")
+        for md in sorted(d.rglob("*.md")):
+            errors += link_errors(md)
+    for md in (README, AGENTS):
+        if md.exists():
+            errors += link_errors(md)
     if EVALS.exists():
         counts = {n: 0 for n in names}
         for i, line in enumerate(EVALS.read_text(encoding="utf-8").splitlines(), 1):
@@ -108,24 +140,40 @@ def validate():
     return errors
 
 
+def profile_stem(path):
+    return path.name[:-len(".agent.md")] if path.name.endswith(".agent.md") else path.stem
+
+
+def valid_profile_name(stem, scope, skill_names):
+    if scope == "shared":
+        return stem.startswith("shared-")
+    return any(stem.startswith(f"{name}-") for name in skill_names)
+
+
 def validate_agent_sources():
     errors = []
-    scopes = {
-        "shared": lambda stem: stem.startswith("shared-"),
-        "skill-specific": lambda stem: any(stem.startswith(f"{path.name}-") for path in skill_dirs()),
-    }
     if not AGENT_SOURCES.is_dir():
         return errors
+    names = sorted(p.name for p in skill_dirs())
     for host in sorted(path for path in AGENT_SOURCES.iterdir() if path.is_dir()):
-        for scope, matches in scopes.items():
+        profiles = []
+        workflow_profiles = []
+        for scope in ("shared", "skill-specific"):
             folder = host / scope
             if not folder.is_dir():
                 continue
             for path in sorted(folder.glob("*.md")):
-                stem = path.name[:-len(".agent.md")] if path.name.endswith(".agent.md") else path.stem
-                if not matches(stem):
+                profiles.append(path)
+                stem = profile_stem(path)
+                if scope == "skill-specific" and stem.endswith("-workflow"):
+                    workflow_profiles.append(path)
+                if not valid_profile_name(stem, scope, names):
                     expected = "shared-<role>" if scope == "shared" else "<owning-skill-name>-<role>"
                     errors.append(f"{path.relative_to(ROOT)}: name must use {expected}")
+        if len(profiles) > 2:
+            errors.append(f"{host.name}: {len(profiles)} agent profiles > 2; combine workflows into one main agent and one helper")
+        if profiles and len(workflow_profiles) != 1:
+            errors.append(f"{host.name}: supply exactly one skill-specific main profile ending in -workflow")
     return errors
 
 
@@ -135,12 +183,15 @@ def dashes():
         parts = p.relative_to(ROOT).parts
         if not p.is_file() or ".git" in parts or parts[0] == "reference-content":
             continue
-        try:
-            lines = p.read_text(encoding="utf-8").splitlines()
-        except UnicodeDecodeError:
+        if any(dash in p.name for dash in BANNED_DASHES):
+            errors.append(f"{p.relative_to(ROOT)}: em or en dash in the file name (use a hyphen)")
+        text = read_text(p)
+        if text is None:
+            if p.suffix.lower() in TEXT_EXTENSIONS or p.suffix == "":
+                errors.append(f"{p.relative_to(ROOT)}: not UTF-8 text, so dashes cannot be checked")
             continue
-        for i, line in enumerate(lines, 1):
-            if any(d in line for d in BANNED_DASHES):
+        for i, line in enumerate(text.splitlines(), 1):
+            if any(dash in line for dash in BANNED_DASHES):
                 errors.append(f"{p.relative_to(ROOT)}:{i}: em or en dash (use a hyphen)")
     return errors
 
@@ -160,11 +211,10 @@ def strip_terms():
             targets += [x for x in d.rglob("*") if x.is_file()]
     errors = []
     for x in targets:
-        try:
-            lines = x.read_text(encoding="utf-8").splitlines()
-        except (UnicodeDecodeError, FileNotFoundError):
+        text = read_text(x)
+        if text is None:
             continue
-        for i, line in enumerate(lines, 1):
+        for i, line in enumerate(text.splitlines(), 1):
             low = line.lower()
             for term in terms:
                 if term in low:
@@ -188,9 +238,44 @@ def ship_checks():
                     continue
                 if " " in inner or inner[0].isupper():
                     errors.append(f"{rel}:{i}: leftover placeholder <{inner}>")
-    for leftover in ("SETUP.md", "templates", "reference-content"):
-        if (ROOT / leftover).exists():
-            errors.append(f"{leftover}: setup scaffolding still present (delete before shipping)")
+    try:
+        tracked = subprocess.run(
+            ["git", "ls-files", "--cached", "--", *PRIVATE_PATHS],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return errors + ["git is not installed, so ship checks could not run"], False
+    if tracked.returncode:
+        errors.append("could not read the Git index; commit the repository before shipping")
+    else:
+        errors.extend(
+            f"{path}: private setup file is tracked; keep it local and ignored"
+            for path in tracked.stdout.splitlines()
+        )
+    # Checked one path at a time: `git check-ignore --quiet` rejects several paths at once.
+    # Only paths that exist are tested, because a directory-only ignore rule cannot match a
+    # path that is not there, and a repo with no reference-content/ has nothing to leak yet.
+    unignored = []
+    for rel in PRIVATE_PATHS:
+        if not (ROOT / rel).exists():
+            continue
+        try:
+            result = subprocess.run(
+                ["git", "check-ignore", "--quiet", "--no-index", "--", rel],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        except FileNotFoundError:
+            return errors + ["git is not installed, so ship checks could not run"], False
+        if result.returncode != 0:
+            unignored.append(rel)
+    if unignored:
+        errors.append("setup-only paths must be ignored in .gitignore: " + ", ".join(unignored))
     return errors, False
 
 
@@ -198,8 +283,8 @@ def build_catalogue():
     rows = ["| Skill | Purpose |", "|---|---|"]
     for d in skill_dirs():
         fm, _ = parse(d / "SKILL.md")
-        desc = fm["description"]
-        first = re.split(r"(?<=\.)\s", desc, maxsplit=1)[0]
+        desc = (fm or {}).get("description", "")
+        first = re.split(r"(?<=\.)\s", desc, maxsplit=1)[0] if desc else ""
         rows.append(f"| [`{d.name}`](skills/{d.name}/SKILL.md) | {first} |")
     return "\n".join(rows)
 

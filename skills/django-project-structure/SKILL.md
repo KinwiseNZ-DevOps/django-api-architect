@@ -31,7 +31,8 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - Add the app module to the optional (or core) app list, and enable it through the environment variable that controls optional apps (a comma-separated list, so no code change is needed to switch a pack on or off).
    - Give the app a `manifest.py` declaring `APP_MANIFEST` with all seven keys: `app`, `name`, `optional`, `dependencies`, `required_settings`, `url_prefix`, `urlconf`. The loader validates the keys and the app label match, so a wrong manifest fails loudly at import.
    - URL mounting is dynamic: the root URL config mounts a pack's `urlconf` under its `url_prefix` only when the app is installed, so disabling a pack removes its routes with it.
-3. **Verify.** The app imports, its manifest loads, `INSTALLED_APPS` contains it if and only if it is enabled, and its routes appear under the declared prefix.
+   - Migrations travel with the change that caused them. Generate the app's initial migration with `makemigrations`, read the generated file, and commit it with the app. A model without its migration is not installable.
+3. **Verify.** The app imports, its manifest loads, `INSTALLED_APPS` contains it if and only if it is enabled, its routes appear under the declared prefix, and `migrate` runs clean against the committed migrations.
 
 ## Hard rules
 
@@ -39,6 +40,7 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
 - Core apps stay generic; domain behaviour lives in packs. Mechanism: symptom is core apps growing domain-specific branches; cause is in-place shortcuts; fix is a new pack plus manifest.
 - Settings live in one file per environment plus one partial per concern, composed in `base.py`; environment differences are environment variables, not divergent code. Mechanism: duplicated settings drift between environments; builder functions and partials keep single sources.
 - Required secrets have no default (fail fast at import); optional values carry safe defaults. Never commit `.env`; ship `.env.example` instead.
+- Never edit a migration that has already been applied in another environment. Mechanism: symptom is a schema that no longer matches any migration and cannot be replayed; cause is editing history that other environments have already recorded; fix is a new corrective migration, never a rewrite of an old one.
 
 ## References
 

@@ -1,6 +1,6 @@
 __pycache__/
 *.pyc
 .DS_Store
-reference-content/raw/*
-!reference-content/raw/.gitkeep
-reference-content/
+/SETUP.md
+/templates/
+/reference-content/
