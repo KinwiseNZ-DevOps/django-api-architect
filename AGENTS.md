@@ -52,6 +52,8 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
   - `django-api-architect` is the router; it links every sibling and is the entry point for install. Reason: one install target keeps the set coherent.
   - `reference-content/strip-terms.txt` allows the public styleguide's repo names on purpose (credited as theory), while the owner's company name, author names and the example project's internal module names stay stripped, with one exception: the `LICENSE` copyright line names the company on purpose. Reason: recorded decisions by the owner on 2026-10-17.
 
+- `hooks/`: the always-on start-up hook. `hooks/always-on.config.json` holds the id, name, phrase, rules path and auto-detect markers; `skills/django-api-architect/references/always-on-rules.md` is the only source of the rules it loads. Keep that file under 320 words. Reason: it is paid for in tokens at the start of every session, and a copy would drift from the skills. The saved mode (on, off or auto) lives in the user's `~/.claude/.django-api-architect.mode`, never in this repo.
+
 ## Irreversible and shared actions
 
 - Proceed freely for local, reversible actions: editing files, running checks, regenerating the catalogue.

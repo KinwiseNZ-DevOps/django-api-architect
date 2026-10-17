@@ -1,0 +1,25 @@
+{
+  "id": "django-api-architect",
+  "name": "Django API Architect",
+  "phrase": "django",
+  "rules": "skills/django-api-architect/references/always-on-rules.md",
+  "defaultMode": "on",
+  "autoDetect": true,
+  "autoMarkers": [
+    {
+      "file": "manage.py"
+    },
+    {
+      "file": "pyproject.toml",
+      "contains": "django"
+    },
+    {
+      "file": "requirements.txt",
+      "contains": "django"
+    },
+    {
+      "file": "requirements/base.txt",
+      "contains": "django"
+    }
+  ]
+}

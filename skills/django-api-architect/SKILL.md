@@ -52,3 +52,7 @@ Use this delegation when the runtime can start or hand off to an available agent
 ## Next
 
 All specialist skills are linked in the gate table above.
+
+## Always-on mode
+
+When the plugin is installed, a start-up hook adds [always-on-rules.md](references/always-on-rules.md) to every Claude Code session. The user can say "stop django mode" to pause it, or ask for the saved mode to be set to on, off or auto. The rules file is the single source of those rules; edit it, not a copy.

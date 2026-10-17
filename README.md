@@ -119,6 +119,21 @@ Or copy or symlink the `skills/` subfolders you want into your agent's skills di
 
 ---
 
+### Always on
+
+In Claude Code, Django API Architect loads a short ruleset into every session as soon as the plugin is installed (thin APIs, logic in services and selectors, environment-driven settings, Docker conventions). It tells you its state at the start of each session and costs roughly 350 tokens.
+
+| Mode | What it does |
+|---|---|
+| `on` (default) | The rules apply in every session |
+| `auto` | The rules apply only in projects that look relevant: a `manage.py` or a Django requirement is found |
+| `off` | The rules do not load |
+
+- Say **"stop django mode"** to pause it for the current session, and **"start django mode"** to resume.
+- Ask Claude to **set the saved mode to on, off or auto**. It writes that word into `~/.claude/.django-api-architect.mode`. You can also edit that file yourself, and deleting it returns to the default (`on`).
+- It needs Node on the machine, because the start-up hook runs a small Node script. Without Node the hook quietly does nothing.
+- Other agents have no start-up hook here. Paste `skills/django-api-architect/references/always-on-rules.md` into that agent's instruction file instead.
+
 <a id="usage"></a>
 ## 🚀 Usage
 
