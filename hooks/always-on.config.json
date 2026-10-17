@@ -21,5 +21,6 @@
       "file": "requirements/base.txt",
       "contains": "django"
     }
-  ]
+  ],
+  "features": {}
 }
