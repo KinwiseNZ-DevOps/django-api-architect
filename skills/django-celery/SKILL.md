@@ -26,7 +26,7 @@ Stance: tasks are interfaces, not logic. A task fetches its inputs, calls a serv
 1. **Detect.** Find the app's `tasks.py` (or `tasks/` package). Confirm the shape: `@app.task(bind=True, max_retries=..., default_retry_delay=...)`, thin bodies, retry handling in the task, services imported inside the function body, tasks imported at module level with a `_task` alias when names collide.
 2. **Fix.**
    - Write the task as fetch-then-delegate; retries use `self.retry(exc=..., countdown=...)` with a bounded `max_retries` and an increasing countdown; the exhausted case goes to an `on_failure` callback named `_<task_name>_failure`, which calls a service.
-   - Inside `@transaction.atomic` services, trigger with `transaction.on_commit(lambda: task.delay(...))`, never directly.
+   - Inside `@transaction.atomic` services, trigger with `transaction.on_commit(lambda: task.delay(...))`, never directly. `on_commit` callbacks take no arguments (bind with a lambda or `functools.partial`), run immediately if there is no open transaction, and are discarded if the transaction rolls back. With the default `robust=False`, an exception in one callback skips the later ones registered in the same transaction.
    - Webhook providers: one endpoint that verifies the signature (400 on failure), logs the event idempotently in an event table inside a transaction, dispatches a dispatcher task, and acknowledges 200 within the provider's timeout. The dispatcher maps event types to handlers, skips already-processed events, marks `processed_at` after success, and retries on handler failure. Handlers call idempotent service upserts.
 3. **Verify.** Task tests confirm delegation, retry-on-failure and exhaustion behaviour (see django-testing); no task duplicates logic that exists in a service.
 
@@ -43,7 +43,7 @@ Stance: tasks are interfaces, not logic. A task fetches its inputs, calls a serv
 
 ## References
 
-Theory source: the public Django Styleguide, https://github.com/HackSoftware/Django-Styleguide (celery section).
+Theory source: the public Django Styleguide, https://github.com/HackSoftware/Django-Styleguide (celery section). `on_commit` behaviour: https://docs.djangoproject.com/en/6.1/topics/db/transactions/
 
 ## Next
 

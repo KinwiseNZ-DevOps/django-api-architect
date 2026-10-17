@@ -126,6 +126,14 @@ AGENTS.md                   agent-facing rules for this repo
 
 </details>
 
+## 🙏 Credits
+
+Details in the skills are checked against the official documentation, linked from the skill that uses them:
+
+- [Django REST framework](https://www.django-rest-framework.org/): permissions and throttling behaviour.
+- [Django documentation](https://docs.djangoproject.com/en/6.1/): transactions and `on_commit`.
+- [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide): the service and selector layer theory.
+
 ## 📌 Status and limits
 
 > [!NOTE]

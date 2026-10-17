@@ -29,6 +29,9 @@ Stance: APIs are frozen as thin interfaces: one APIView class per operation, val
    - List filtering: the API owns a nested `FilterSerializer` validating query params, and passes `validated_data` to the selector, which does the actual filtering (typically with `django-filter`).
    - Pagination: apply through the pagination helper (limit/offset, `default_limit` 10, `max_limit` 50), returning `limit`, `offset`, `count`, `next`, `previous`, `results` in the body.
    - Detail: fetch via a user-scoped selector; catch `DoesNotExist` and return `{"detail": "Not found."}` with 404.
+   - Permissions: set a restrictive global default in `REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES']` and override with `permission_classes` per API only where needed. Compose classes with `&`, `|` and `~` rather than writing new classes for simple combinations.
+   - Object-level access: DRF's object permission checks do not run on list or create actions, so list access is enforced by the selector's user-scoped query and creates by the service. For detail APIs that fetch objects themselves, call `self.check_object_permissions(request, obj)` or rely on the user-scoped selector.
+   - Throttling: use `ScopedRateThrottle` with a `throttle_scope` per API group and rates in `DEFAULT_THROTTLE_RATES`. Throttles use Django's cache; behind a proxy set `NUM_PROXIES` correctly.
    - Document every endpoint with `@extend_schema` (tags, summary, request, responses including error codes).
 3. **Verify.** Endpoint tests pass; schema at `/api/schema/` renders; the response shape matches the error contract below.
 
@@ -37,10 +40,13 @@ Stance: APIs are frozen as thin interfaces: one APIView class per operation, val
 - One API class per operation; no generic views or viewsets. Mechanism: generic classes manage behaviour via serializers and hooks, which fragments logic and hides data flow; explicit classes stay greppable and simple.
 - Serializers validate and shape data only; no business logic in serializers. Mechanism: hidden `create`/`update` overrides make writes untraceable.
 - Errors always come back in the project's one JSON contract (validation as `{"field": ["message"]}` or the message-plus-extra shape; everything else as `detail`). Django's `ValidationError` must be converted to DRF's at the exception-handler boundary. Mechanism: symptom is 500s on model validation or inconsistent error shapes per endpoint; cause is Django and DRF exceptions reaching the client raw; fix is the normalising exception handler.
+- Never rely on DRF's default permissions. Mechanism: with `DEFAULT_PERMISSION_CLASSES` unset DRF applies `AllowAny`, so a forgotten `permission_classes` leaves an endpoint open; fix is a restrictive global default.
+- Treat throttling as abuse control, not security. Mechanism: client IPs come from `X-Forwarded-For` or `REMOTE_ADDR` and can be spoofed, clients behind one NAT share a limit, and built-in throttles can admit a few extra requests under heavy concurrency; strict guarantees need a custom throttle or an upstream control.
 - Cap pagination (`max_limit`). Mechanism: an uncapped limit lets one request pull unbounded rows.
 
 ## Next
 
 - Services and selectors the APIs call: [django-services-selectors](../django-services-selectors/SKILL.md)
 - Auth endpoints: [django-auth](../django-auth/SKILL.md)
+- DRF reference for permissions and throttling: https://www.django-rest-framework.org/api-guide/permissions/ and https://www.django-rest-framework.org/api-guide/throttling/
 - Error handler details: the platform plumbing section of your project's `apps/common` (or equivalent) and https://github.com/HackSoftware/Django-Styleguide

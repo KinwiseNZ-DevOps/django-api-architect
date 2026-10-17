@@ -29,6 +29,7 @@ Stance: the pytest layout and the mock boundaries are frozen; what counts as eno
    - APIs: status codes, response shapes, the error contract, permission outcomes.
    - Models: only when the model adds validation, properties or methods; validation tests need no database.
    - Tasks: that they call the service, retry on failure, and stop after `max_retries`.
+   - `on_commit` triggers: tests that run inside a rolled-back transaction never fire `transaction.on_commit` callbacks. Collect them with Django's `captureOnCommitCallbacks()` to assert the task was scheduled, and check whether your pytest-django version offers an equivalent fixture.
    - Build state through real services (`user_create`) rather than raw `Model.objects.create()`, so validation runs in test state too; use fixtures for shared state.
 3. **Verify.** `python -m pytest` passes (single app: `python -m pytest apps/<name>/tests`); every changed behaviour has at least one failure-path test.
 
@@ -40,7 +41,7 @@ Stance: the pytest layout and the mock boundaries are frozen; what counts as eno
 
 ## References
 
-Rules source: the public Django Styleguide, https://github.com/HackSoftware/Django-Styleguide (testing section); starter practice follows pytest conventions.
+Rules source: the public Django Styleguide, https://github.com/HackSoftware/Django-Styleguide (testing section); starter practice follows pytest conventions. `on_commit` in tests: https://docs.djangoproject.com/en/6.1/topics/db/transactions/
 
 ## Next
 

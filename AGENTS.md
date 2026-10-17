@@ -53,9 +53,17 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 - Proceed freely for local, reversible actions: editing files, running checks, regenerating the catalogue.
 - Ask first for anything destructive, hard to undo, or visible to others: deleting branches or history, force-pushes, changing repository visibility, pushing to shared sources. Reason: damage in a public repo cannot be recalled.
 
+## Commit attribution
+
+- Do not add `Co-Authored-By` trailers for AI assistants to commit messages. Add co-author attribution only when the user explicitly requests it. Reason: commit trailers affect GitHub's contributor attribution.
+
 ## Known deliberate states (dated)
 
 - None.
+
+## Known deliberate states (dated)
+
+- 2026-10-17: the repo ships without `reference-content/`. The owner's audit material (the BRIEF, converted sources, strip terms and raw originals) is deliberately preserved outside the repository at `_archive/django-api-architect-reference-content/`. Reason: the setup pipeline must not be public, and deleting it entirely would have destroyed the audit trail for the built skills.
 
 ## Anti-drift close-out
 
