@@ -60,6 +60,10 @@ flowchart TD
 
 Route first with django-api-architect, then work in dependency order: structure, services and selectors, APIs, auth and tasks, tests throughout.
 
+## Optional Django admin theme
+
+For projects that also need a modern Django admin interface, [Unfold](https://unfoldadmin.com/) is an optional theme for dashboards and internal tools. It is separate from the API architecture taught here. Use the [Django REST framework documentation](https://www.django-rest-framework.org/) and [Django 6.1 documentation](https://docs.djangoproject.com/en/6.1/) for framework behaviour. The service-layer approach is a project choice informed by the [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide), not a Django requirement.
+
 ## 📦 Install
 
 > [!TIP]
