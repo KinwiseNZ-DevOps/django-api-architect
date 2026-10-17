@@ -1,31 +1,44 @@
 ```
-<ASCII banner of the repo name. Generate one with figlet or any text-to-ASCII tool>
+  ____                          _    __     ___          _   _
+ / ___|  ___ _ __   ___ ___  __| |   \ \   / (_) ___  __| | (_)_ __   ___
+ \___ \ / __| "_ \ / _ " __/ _` |    \ \ / / | / __|/ _` || | "_ \ / _ \
+  ___) | (__| | | | (_) | | (_| |     \ V /  | \__ \ (_| || | | | |  __/
+ |____/ \___|_| |_|\___/___ \__,_|      \_/  |_|___/\__,_||_|_| |_|\___|
+                        |___/
+        specialist skills for Django REST API projects
 ```
 
 <div align="center">
 
-# ⚡ <Repo Name>
+# ⚡ Django API Architect
 
-**<One line: what these skills do, for whom>**
+**Production-grade Django REST Framework API skills for AI coding agents, built around a service layer architecture.**
 
-[![Validate skills](https://github.com/<OWNER>/<REPO>/actions/workflows/validate.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/validate.yml)
+[![Validate skills](https://img.shields.io/badge/ci-skills__tool__check-success)](.github/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Agent skills](https://img.shields.io/badge/agent_skills-1-8A2BE2)](https://agentskills.io)
+[![Agent skills](https://img.shields.io/badge/agent_skills-8-8A2BE2)](https://agentskills.io)
 [![Format](https://img.shields.io/badge/format-SKILL.md-orange)](https://agentskills.io/specification)
 [![Tooling](https://img.shields.io/badge/tooling-stdlib_only-success)](scripts/skills_tool.py)
 
 </div>
 
 > [!IMPORTANT]
-> **Principle: <the single sentence every skill in this repo must obey.>**
+> **Principle: business logic lives in services and selectors; APIs, serializers and models stay thin interfaces over it.**
 
-<Two or three sentences: what problems the skills solve, what they are grounded in (official docs or authoritative sources), and that they follow the open [Agent Skills](https://agentskills.io/specification) format. Name the agents they work in, e.g. Claude Code, Codex, Cursor, Copilot, OpenCode, or any SKILL.md-compatible agent.>
+Seven skills that let a coding agent build, review and extend Django REST API projects with confidence: app packs and project structure, thin DRF APIs with a stable error contract, a service and selector layer, pytest conventions, JWT and OTP authentication, and Celery task wiring. They follow the open [Agent Skills](https://agentskills.io/specification) format and work in Claude Code, Codex, Cursor, Copilot, OpenCode, or any SKILL.md-compatible agent. They are grounded in a production Django API starter (team-written) and the public [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide) (credited as supporting theory).
 
 ## 🧩 Skills
 
 <!-- catalogue:begin -->
 | Skill | Purpose |
 |---|---|
+| [`django-api-architect`](skills/django-api-architect/SKILL.md) | Router and shared guardrails for Django REST Framework API projects built on a service layer architecture with thin APIs, services, selectors and app packs. |
+| [`django-apis-serializers`](skills/django-apis-serializers/SKILL.md) | Governs DRF API classes, input and output serializers, filtering, pagination, and the JSON error contract. |
+| [`django-auth`](skills/django-auth/SKILL.md) | Governs authentication in Django API projects: JWT login, refresh and logout, passwordless OTP codes, admin second factor, and login throttling. |
+| [`django-celery`](skills/django-celery/SKILL.md) | Governs Celery task structure, retries, transaction-safe task triggering, webhook dispatch chains, periodic tasks and Celery configuration. |
+| [`django-project-structure`](skills/django-project-structure/SKILL.md) | Governs Django app layout, the app pack shape, app manifests, and settings organisation for service layer API projects. |
+| [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
+| [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
 | [`example-skill`](skills/example-skill/SKILL.md) | Placeholder skill demonstrating this repository's skill format: the gate, steps, hard rule phrasing and reference layout. |
 <!-- catalogue:end -->
 
@@ -33,13 +46,16 @@
 
 ```mermaid
 flowchart TD
-    R["⚡ <router-skill><br/><what it routes and enforces>"]
-    R --> A["🔍 <skill-a><br/><one-line scope>"]
-    R --> B["🛠️ <skill-b><br/><one-line scope>"]
-    R --> C["✅ <skill-c><br/><one-line scope>"]
+    R["⚡ django-api-architect<br/>routes by layer, enforces shared guardrails"]
+    R --> A["🏗️ django-project-structure<br/>app packs, manifests, settings"]
+    R --> C["🔌 django-apis-serializers<br/>thin APIs, serializers, error contract"]
+    R --> S["⚙️ django-services-selectors<br/>business logic, validation, transactions"]
+    R --> T["✅ django-testing<br/>pytest layout, mock boundaries"]
+    R --> A2["🔑 django-auth<br/>JWT, OTP, admin second factor"]
+    R --> K["📨 django-celery<br/>tasks, retries, webhooks"]
 ```
 
-<One sentence on the order or priority in which the skills usually apply. Delete this section and the diagram for a repo with a single skill.>
+Route first with django-api-architect, then work in dependency order: structure, services and selectors, APIs, auth and tasks, tests throughout.
 
 ## 📦 Install
 
@@ -61,16 +77,21 @@ Copy or symlink the `skills/` subfolders you want into your agent's skills direc
 **The flow** (this is all most people need):
 
 ```text
-1. "<first phrase>"     → <what happens>
-2. "<second phrase>"    → <what happens>
-3. "<third phrase>"     → <what happens>
+1. "Add a billing feature"      → structure skill: new pack, manifest, routes
+2. "Write the refund logic"     → services skill: service, validation, transaction
+3. "Expose it as an endpoint"   → APIs skill: thin APIView, serializers, schema
 ```
 
 **Short phrases that trigger each skill:**
 
 | Just say… | What you get | Skill used |
 |---|---|---|
-| `<short plain phrase>` | <what happens> | *<skill>* |
+| `where does this logic go?` | placement decision, pack shape | *django-project-structure* |
+| `write the service / selector` | business logic with validation and transactions | *django-services-selectors* |
+| `add an endpoint` | thin API class, serializers, pagination, error contract | *django-apis-serializers* |
+| `login / OTP / token` | JWT and OTP flows, throttling, admin second factor | *django-auth* |
+| `background task / webhook` | Celery task, retries, on_commit triggering | *django-celery* |
+| `test this` | pytest layout, mock boundaries, failure paths | *django-testing* |
 
 > [!NOTE]
 > Skills also trigger on their own when your request matches. In Claude Code you can also invoke one explicitly with `/<skill-name>`, but the plain phrases above are shorter and work across every agent.
@@ -103,13 +124,16 @@ reference-content/          source material the skills are built from; delete wh
 ## 📌 Status and limits
 
 > [!NOTE]
-> - <Known limits, each dated, mirroring the "Known deliberate states" section of AGENTS.md.>
+> - 2026-10-17: setup scaffolding (`SETUP.md`, `reference-content/`, `templates/`, `skills/example-skill/`) still present, pending owner audit of the built skills.
+> - The CI badge above points at the workflow file locally; restore the standard actions badge URL with the real owner and repo name once the repository is pushed, because the owner's GitHub organisation name may not appear in published skills or README text (see `reference-content/strip-terms.txt`).
+> - The skills teach a primary architecture from an in-house Django API starter; projects with different structures win where they differ, and the router states that explicitly.
+> - Throttle rates, quotas and provider credentials are per project; the skills describe patterns, not values.
 > - Licensed under MIT (see [LICENSE](LICENSE)).
 
 ---
 
 <div align="center">
 
-**⚡ Built on the [Agent Skills](https://agentskills.io) open format · grounded in <link to the official docs or sources>**
+**⚡ Built on the [Agent Skills](https://agentskills.io) open format · grounded in an in-house Django API starter and the [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide)**
 
 </div>

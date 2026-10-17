@@ -1,0 +1,46 @@
+---
+name: django-apis-serializers
+description: >
+  Governs DRF API classes, input and output serializers, filtering,
+  pagination, and the JSON error contract. Use when writing or changing API
+  endpoints, serializers, list filtering, pagination or error responses. Do
+  not use for the business logic those APIs call (django-services-selectors)
+  or for login and token endpoints (django-auth).
+---
+
+# Django APIs and Serializers
+
+Stance: APIs are frozen as thin interfaces: one APIView class per operation, validate, delegate, serialise. Serialisation strategy is flexible as long as input and output stay separate.
+
+## Gate
+
+| Situation | Action |
+|---|---|
+| New endpoint, or changes to an endpoint's contract | Continue |
+| Business logic wanted inside the API (calculations, writes beyond delegation) | Push back; move it to a service |
+| Change is only internal to a service the API calls | Route to django-services-selectors |
+
+## Steps
+
+1. **Detect.** Find the app's `apis.py` and `urls.py`. Confirm the existing shape: plain `APIView` per operation, `permission_classes` explicit, `@extend_schema` annotations feeding the OpenAPI schema, and one path per API with a named route.
+2. **Fix.** Follow the house patterns, least invasive first:
+   - Reads: a module-level output serializer shared by list and detail; the API calls a selector and returns `Serializer(data).data`.
+   - Writes: nest `InputSerializer` and `OutputSerializer` in the API class; validate with `is_valid(raise_exception=True)`, resolve caller context, call the service with keyword arguments.
+   - List filtering: the API owns a nested `FilterSerializer` validating query params, and passes `validated_data` to the selector, which does the actual filtering (typically with `django-filter`).
+   - Pagination: apply through the pagination helper (limit/offset, `default_limit` 10, `max_limit` 50), returning `limit`, `offset`, `count`, `next`, `previous`, `results` in the body.
+   - Detail: fetch via a user-scoped selector; catch `DoesNotExist` and return `{"detail": "Not found."}` with 404.
+   - Document every endpoint with `@extend_schema` (tags, summary, request, responses including error codes).
+3. **Verify.** Endpoint tests pass; schema at `/api/schema/` renders; the response shape matches the error contract below.
+
+## Hard rules
+
+- One API class per operation; no generic views or viewsets. Mechanism: generic classes manage behaviour via serializers and hooks, which fragments logic and hides data flow; explicit classes stay greppable and simple.
+- Serializers validate and shape data only; no business logic in serializers. Mechanism: hidden `create`/`update` overrides make writes untraceable.
+- Errors always come back in the project's one JSON contract (validation as `{"field": ["message"]}` or the message-plus-extra shape; everything else as `detail`). Django's `ValidationError` must be converted to DRF's at the exception-handler boundary. Mechanism: symptom is 500s on model validation or inconsistent error shapes per endpoint; cause is Django and DRF exceptions reaching the client raw; fix is the normalising exception handler.
+- Cap pagination (`max_limit`). Mechanism: an uncapped limit lets one request pull unbounded rows.
+
+## Next
+
+- Services and selectors the APIs call: [django-services-selectors](../django-services-selectors/SKILL.md)
+- Auth endpoints: [django-auth](../django-auth/SKILL.md)
+- Error handler details: the platform plumbing section of your project's `apps/common` (or equivalent) and https://github.com/HackSoftware/Django-Styleguide
