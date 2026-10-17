@@ -1,0 +1,12 @@
+{
+  "name": "django-api-architect-marketplace",
+  "owner": { "name": "KinWise Limited" },
+  "description": "KinWise agent skills plugins",
+  "plugins": [
+    {
+      "name": "django-api-architect",
+      "source": "./",
+      "description": "Django REST Framework skills for a service layer architecture, with a workflow agent"
+    }
+  ]
+}

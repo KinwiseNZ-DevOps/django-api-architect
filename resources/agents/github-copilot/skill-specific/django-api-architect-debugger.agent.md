@@ -11,12 +11,12 @@ Systematically find and fix bugs in Django and Django REST Framework projects. F
 
 Read the relevant skill before changing that layer. For cross-layer bugs, trace the whole path and apply the skills in dependency order.
 
-- App structure, settings, URLs, or app-pack placement: [django-project-structure](../../skills/django-project-structure/SKILL.md).
-- API classes, serializers, permissions, filtering, pagination, or response errors: [django-apis-serializers](../../skills/django-apis-serializers/SKILL.md).
-- Business logic, validation, selectors, transactions, or model behaviour: [django-services-selectors](../../skills/django-services-selectors/SKILL.md).
-- Test failures, regression coverage, factories, or mocks: [django-testing](../../skills/django-testing/SKILL.md).
-- Login, tokens, OTP, or authentication: [django-auth](../../skills/django-auth/SKILL.md).
-- Celery tasks, retries, periodic work, or webhooks: [django-celery](../../skills/django-celery/SKILL.md).
+- App structure, settings, URLs, or app-pack placement: the `django-project-structure` skill.
+- API classes, serializers, permissions, filtering, pagination, or response errors: the `django-apis-serializers` skill.
+- Business logic, validation, selectors, transactions, or model behaviour: the `django-services-selectors` skill.
+- Test failures, regression coverage, factories, or mocks: the `django-testing` skill.
+- Login, tokens, OTP, or authentication: the `django-auth` skill.
+- Celery tasks, retries, periodic work, or webhooks: the `django-celery` skill.
 
 ## Debugging process
 

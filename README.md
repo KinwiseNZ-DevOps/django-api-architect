@@ -99,7 +99,14 @@ For projects that also need a modern Django admin interface, [Unfold](https://un
 > [!TIP]
 > Install the router skill **plus every sibling skill it links to**; routers reference siblings by relative path.
 
-Copy or symlink the `skills/` subfolders you want into your agent's skills directory:
+**Claude Code plugin** (installs the skills and both agent profiles together):
+
+```text
+/plugin marketplace add KinwiseNZ-DevOps/django-api-architect
+/plugin install django-api-architect@django-api-architect-marketplace
+```
+
+Or copy or symlink the `skills/` subfolders you want into your agent's skills directory:
 
 | Agent | Where skills live |
 |---|---|
@@ -143,7 +150,7 @@ Copy or symlink the `skills/` subfolders you want into your agent's skills direc
 
 When a skill is invoked, its router uses the [django-api-architect-workflow](.github/agents/django-api-architect-workflow.agent.md) main profile for normal requests, planning, implementation, and review. It can use [django-api-architect-debugger](.github/agents/django-api-architect-debugger.agent.md) as the optional debugging helper. Each host has at most these two profiles. Prefixing names with the skill slug helps avoid clashes when profiles are installed alongside agents from other skills.
 
-Host profiles are provided for [GitHub Copilot](.github/agents/) and [Claude Code](.claude/agents/). Codex role briefs are provided in [agents/codex/](agents/codex/); Codex reads them when the router skill directs it, and can use native subagent delegation when the runtime provides it. The Codex briefs are prompt templates, not automatically discovered profiles. Other SKILL.md-compatible hosts can follow the router skill directly or use the role briefs as prompt material. Copy the relevant host profiles into the project where you install the skills; installing a skill alone does not install host agent profiles.
+Host profiles are provided for [GitHub Copilot](.github/agents/) and [Claude Code](.claude/agents/). Codex role briefs are provided in [resources/agents/codex/](resources/agents/codex/); after `install_agents.py --host codex` they sit in the target project's `agents/codex/`, and Codex reads them when the router skill directs it, and can use native subagent delegation when the runtime provides it. The Codex briefs are prompt templates, not automatically discovered profiles. Other SKILL.md-compatible hosts can follow the router skill directly or use the role briefs as prompt material. Copy the relevant host profiles into the project where you install the skills; installing a skill alone does not install host agent profiles.
 
 ---
 
@@ -168,7 +175,8 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 skills/<name>/SKILL.md       one folder per skill (+ references/ where needed)
 .github/agents/*.agent.md    optional GitHub Copilot agents
 .claude/agents/*.md          optional Claude Code project agents
-agents/codex/*.md            Codex role briefs for runtime delegation
+resources/agents/            host profile sources (Claude Code, Copilot, Codex)
+.claude-plugin/              plugin.json and marketplace.json (Claude Code plugin)
 evals/cases.jsonl            3+ behavioural cases per skill
 scripts/skills_tool.py       validate, regenerate catalogue (stdlib only)
 .github/workflows/           CI runs `skills_tool.py check` (free on public repos)

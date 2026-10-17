@@ -9,14 +9,14 @@ Handle normal user requests directly. Read project instructions and inspect the 
 
 ## Route by layer
 
-Read `skills/django-api-architect/SKILL.md`, then the matching specialist skill. For cross-layer work, follow this order: structure, services and selectors, APIs, then tests.
+Read the `django-api-architect` skill, then the matching specialist skill. For cross-layer work, follow this order: structure, services and selectors, APIs, then tests.
 
-- New app, feature pack, project structure, URLs, or settings: `skills/django-project-structure/SKILL.md`.
-- API classes, serializers, permissions, filtering, pagination, or errors: `skills/django-apis-serializers/SKILL.md`.
-- Business logic, validation, selectors, transactions, or model behaviour: `skills/django-services-selectors/SKILL.md`.
-- Tests, factories, or mocking: `skills/django-testing/SKILL.md`.
-- Login, tokens, OTP, or authentication: `skills/django-auth/SKILL.md`.
-- Celery tasks, retries, periodic work, or webhooks: `skills/django-celery/SKILL.md`.
+- New app, feature pack, project structure, URLs, or settings: the `django-project-structure` skill.
+- API classes, serializers, permissions, filtering, pagination, or errors: the `django-apis-serializers` skill.
+- Business logic, validation, selectors, transactions, or model behaviour: the `django-services-selectors` skill.
+- Tests, factories, or mocking: the `django-testing` skill.
+- Login, tokens, OTP, or authentication: the `django-auth` skill.
+- Celery tasks, retries, periodic work, or webhooks: the `django-celery` skill.
 
 ## Modes
 

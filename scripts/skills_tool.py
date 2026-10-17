@@ -5,7 +5,7 @@
   python scripts/skills_tool.py catalogue    # rewrite README catalogue block
   python scripts/skills_tool.py check        # validate + fail if catalogue is stale
 
-Dashes are always checked in text files outside reference-content/, which holds raw source material. Ship checks for placeholders and setup-only paths in the Git index run once skills/example-skill has been deleted.
+Plugin manifests in .claude-plugin/, agent profile contents and the manifest agents list are checked on every run. Dashes are always checked in text files outside reference-content/, which holds raw source material. Ship checks for placeholders and setup-only paths in the Git index run once skills/example-skill has been deleted.
 """
 import json
 import re
@@ -28,12 +28,21 @@ MAX_BODY_LINES, MAX_DESC, MAX_NAME, MIN_EVALS = 500, 1024, 64, 3
 BANNED_DASHES = (chr(0x2013), chr(0x2014))
 PLACEHOLDER_RE = re.compile(r"<([A-Za-z][^<>\n]*)>")
 HTML_TAGS = {"details", "summary", "div", "br", "p", "a", "img", "kbd", "sub", "sup"}
-PLACEHOLDER_FILES = ("README.md", "LICENSE", "AGENTS.md", "evals/cases.jsonl")
+PLACEHOLDER_FILES = (
+    "README.md", "LICENSE", "AGENTS.md", "evals/cases.jsonl",
+    ".claude-plugin/plugin.json", ".claude-plugin/marketplace.json",
+)
 TEXT_EXTENSIONS = {
     ".md", ".txt", ".py", ".json", ".jsonl", ".yml", ".yaml", ".toml", ".cfg",
     ".ini", ".sh", ".ps1", ".mjs", ".js", ".ts", ".html", ".css", ".license",
 }
 PRIVATE_PATHS = ("SETUP.md", "templates", "reference-content")
+PLUGIN_DIR = ROOT / ".claude-plugin"
+RESERVED_PLUGIN_PREFIXES = ("claude-", "anthropic-", "anthropics-", "cc-plugin-")
+RESERVED_PLUGIN_NAMES = {"claude", "anthropic", "anthropics", "claude-code", "claude-mods"}
+MARKETPLACE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+IGNORED_AGENT_FIELDS = ("permissionMode", "hooks", "mcpServers", "initialPrompt")
+SKILL_PATH_RE = re.compile(r"skills/[A-Za-z0-9_.-]+/SKILL\.md")
 
 
 def read_text(path):
@@ -177,6 +186,151 @@ def validate_agent_sources():
     return errors
 
 
+def agent_frontmatter(path):
+    m = re.match(r"^---\n(.*?)\n---\n", read_text(path) or "", re.S)
+    return m.group(1) if m else None
+
+
+def agent_skills(frontmatter):
+    skills, listing = [], False
+    for line in frontmatter.splitlines():
+        if re.match(r"^skills:\s*$", line):
+            listing = True
+            continue
+        inline = re.match(r"^skills:\s*(.+)$", line)
+        if inline:
+            return [s.strip() for s in inline.group(1).strip("[]").split(",") if s.strip()]
+        if listing:
+            item = re.match(r"^\s+-\s+(\S+)\s*$", line)
+            if item:
+                skills.append(item.group(1))
+            elif line and not line.startswith(" "):
+                break
+    return skills
+
+
+def agent_profiles(host):
+    for scope in ("shared", "skill-specific"):
+        folder = AGENT_SOURCES / host / scope
+        if folder.is_dir():
+            yield from sorted(folder.glob("*.md"))
+
+
+def validate_agent_contents():
+    errors = []
+    if not AGENT_SOURCES.is_dir():
+        return errors
+    names = {p.name for p in skill_dirs()}
+    for host in sorted(p.name for p in AGENT_SOURCES.iterdir() if p.is_dir()):
+        for path in agent_profiles(host):
+            rel = path.relative_to(ROOT)
+            text = read_text(path) or ""
+            if SKILL_PATH_RE.search(text):
+                errors.append(f"{rel}: refers to skills/<name>/SKILL.md, a path that does not exist in a user's project or an installed plugin. Name the skill and list it under skills: instead")
+            if host != "claude-code":
+                continue
+            fm = agent_frontmatter(path)
+            if fm is None:
+                errors.append(f"{rel}: Claude Code agent has no frontmatter")
+                continue
+            for field in IGNORED_AGENT_FIELDS:
+                if re.search(rf"^{field}:", fm, re.M):
+                    errors.append(f"{rel}: '{field}' is ignored in plugin agents; use plugin hooks or MCP config instead")
+            for skill in agent_skills(fm):
+                if skill not in names:
+                    errors.append(f"{rel}: skills: lists '{skill}', which is not in skills/")
+    return errors
+
+
+def load_json(path):
+    try:
+        return json.loads(read_text(path) or ""), None
+    except (json.JSONDecodeError, OSError) as exc:
+        return None, f"{path.relative_to(ROOT)}: invalid JSON ({exc})"
+
+
+def validate_plugin():
+    errors = []
+    manifest = PLUGIN_DIR / "plugin.json"
+    market = PLUGIN_DIR / "marketplace.json"
+    if not manifest.exists():
+        return [".claude-plugin/plugin.json missing"]
+    data, err = load_json(manifest)
+    if err:
+        return [err]
+    name = data.get("name", "")
+    if not isinstance(name, str) or not name:
+        errors.append(".claude-plugin/plugin.json: name is required")
+        name = ""
+    elif "<" not in name:
+        if not NAME_RE.match(name):
+            errors.append(f".claude-plugin/plugin.json: name '{name}' must be kebab-case")
+        if name in RESERVED_PLUGIN_NAMES or name.startswith(RESERVED_PLUGIN_PREFIXES):
+            errors.append(f".claude-plugin/plugin.json: name '{name}' is reserved for Anthropic plugins")
+    for key in ("version", "description"):
+        if not data.get(key):
+            errors.append(f".claude-plugin/plugin.json: {key} is required")
+    if not (data.get("author") or {}).get("name"):
+        errors.append(".claude-plugin/plugin.json: author.name is required")
+
+    first = (read_text(ROOT / "LICENSE") or "").lstrip().splitlines()[:1]
+    is_mit = bool(first) and first[0].strip() == "MIT License"
+    badge_mit = "license-MIT" in (read_text(README) or "")
+    declared = data.get("license", "")
+    if not declared:
+        errors.append(".claude-plugin/plugin.json: license is required")
+    elif (declared == "MIT") != is_mit:
+        errors.append(f".claude-plugin/plugin.json: license '{declared}' does not match LICENSE ({'MIT' if is_mit else 'not MIT'})")
+    if badge_mit and declared != "MIT":
+        errors.append("README.md: MIT licence badge but plugin.json license is not MIT")
+
+    listed = []
+    if "agents" in data:
+        entries = data["agents"]
+        if not isinstance(entries, list) or not all(isinstance(e, str) for e in entries):
+            errors.append(".claude-plugin/plugin.json: agents must be a list of file paths")
+            entries = []
+        for entry in entries:
+            target = (ROOT / entry).resolve()
+            if not entry.startswith("./") or not entry.endswith(".md") or ".." in entry:
+                errors.append(f".claude-plugin/plugin.json: agents entry '{entry}' must be a ./ path to a .md file inside the repo")
+            elif not target.is_file():
+                errors.append(f".claude-plugin/plugin.json: agents entry '{entry}' does not exist")
+            else:
+                listed.append(target)
+    for path in agent_profiles("claude-code"):
+        if path.resolve() not in listed:
+            errors.append(f".claude-plugin/plugin.json: agents must list ./{path.relative_to(ROOT).as_posix()}; without it Claude Code scans agents/ instead")
+
+    top_agents = ROOT / "agents"
+    if top_agents.is_dir():
+        for md in sorted(top_agents.rglob("*.md")):
+            errors.append(f"{md.relative_to(ROOT).as_posix()}: Claude Code scans a top-level agents/ folder; keep Codex briefs only under resources/agents/codex/")
+
+    if not market.exists():
+        return errors + [".claude-plugin/marketplace.json missing"]
+    mdata, err = load_json(market)
+    if err:
+        return errors + [err]
+    mname = mdata.get("name", "")
+    if not mname or ("<" not in mname and not MARKETPLACE_NAME_RE.match(mname)):
+        errors.append(".claude-plugin/marketplace.json: name missing or invalid")
+    if not (mdata.get("owner") or {}).get("name"):
+        errors.append(".claude-plugin/marketplace.json: owner.name is required")
+    entries = mdata.get("plugins")
+    if not isinstance(entries, list) or len(entries) != 1:
+        errors.append(".claude-plugin/marketplace.json: plugins must hold exactly one entry (this repo)")
+    else:
+        entry = entries[0]
+        if entry.get("name") != name:
+            errors.append(".claude-plugin/marketplace.json: plugin entry name differs from plugin.json name")
+        if entry.get("source") != "./":
+            errors.append('.claude-plugin/marketplace.json: plugin entry source must be "./"')
+        if entry.get("version") and entry.get("version") != data.get("version"):
+            errors.append(".claude-plugin/marketplace.json: entry version differs from plugin.json version")
+    return errors
+
+
 def dashes():
     errors = []
     for p in sorted(ROOT.rglob("*")):
@@ -312,6 +466,8 @@ def main():
     if cmd in ("validate", "check"):
         errors += validate()
         errors += validate_agent_sources()
+        errors += validate_agent_contents()
+        errors += validate_plugin()
         errors += dashes()
         errors += strip_terms()
         ship_errors, skipped = ship_checks()

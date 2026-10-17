@@ -34,7 +34,7 @@ Before reporting any change done, run:
 python scripts/skills_tool.py check
 ```
 
-Checks: frontmatter, name/folder match, description length and trigger, body under 500 lines, every relative link resolves (including README.md and AGENTS.md), agent profile naming with no more than two profiles per host and exactly one `-workflow` main agent, at least 3 eval cases per skill, catalogue not stale, no project-specific terms from `reference-content/strip-terms.txt`, and no em or en dashes in file names or in any text outside `reference-content/`. It also fails on leftover `<placeholder>` text and on setup-only paths (`SETUP.md`, `templates/`, `reference-content/`) that are tracked by Git or not ignored.
+Checks: frontmatter, name/folder match, description length and trigger, body under 500 lines, every relative link resolves (including README.md and AGENTS.md), agent profile naming with no more than two profiles per host and exactly one `-workflow` main agent, agent `skills:` entries that exist and no `skills/<name>/SKILL.md` paths in agent bodies, plugin manifests valid and consistent with `LICENSE` and the profiles, at least 3 eval cases per skill, catalogue not stale, no project-specific terms from `reference-content/strip-terms.txt`, and no em or en dashes in file names or in any text outside `reference-content/`. It also fails on leftover `<placeholder>` text and on setup-only paths (`SETUP.md`, `templates/`, `reference-content/`) that are tracked by Git or not ignored.
 
 - The tool is necessary but not sufficient for content quality. For new or changed skill body text, also re-read the changed SKILL.md end to end. Reason: a validator checks structure; only reading checks that the instructions still make sense.
 
@@ -43,7 +43,8 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 - `skills/<name>/SKILL.md`: the only source of skill content. Folder name equals frontmatter `name`.
 - `.github/agents/*.agent.md`: optional GitHub Copilot agents that run workflows using these skills.
 - `.claude/agents/*.md`: Claude Code project agents for the same workflows.
-- `agents/codex/*.md`: Codex role briefs. The router skill selects a brief by task type; Codex uses native subagent delegation when the runtime provides it, and otherwise follows the brief directly. These are prompt templates, not automatically discovered Codex profiles.
+- `.claude-plugin/plugin.json` and `marketplace.json`: the Claude Code plugin manifest and single-plugin marketplace. The `agents` array lists each Claude Code profile under `resources/agents/claude-code/`. Reason: without the key, Claude Code scans a top-level `agents/` folder and would load Codex briefs as subagents.
+- `resources/agents/codex/*.md`: Codex role briefs (installed into a target project's `agents/codex/`, never into this repo). The router skill selects a brief by task type; Codex uses native subagent delegation when the runtime provides it, and otherwise follows the brief directly. These are prompt templates, not automatically discovered Codex profiles.
 - New skills follow the house format that existing skills embody: folder name equals frontmatter `name`; frontmatter, gate, steps, hard rules.
 - `reference-content/` is git-ignored and never committed: it holds private source material and the names being stripped. Reason: once pushed to a public repo it cannot be recalled.
 - Custom to this repo:
@@ -88,9 +89,3 @@ Finish every task with these five points, in this order:
 - After each user-side step, stop and wait for the user to say they are done before giving the next step. Do not stack several manual steps in one reply. Reason: one task at a time keeps confirmation honest and lets problems surface at the step that caused them.
 - No padding, no restating the question, no caveats that carry no information.
 - Skip em dashes and en dashes entirely and always. They are banned in every reply, every file, every commit message, prose and code comments alike. Every dash in text must be a plain hyphen (-). If a hyphen does not fit, use a comma or rewrite the sentence. Reason: nothing justifies an em dash; a banned character that appears anywhere is a single, checkable, zero-tolerance rule.
-
-<!-- installed-skill-agent-routing:start -->
-## Installed skill agent dispatch
-
-When a task matches a role brief in `agents/codex/`, read the matching brief and use it with the relevant skill instructions. Use native subagent delegation when available; otherwise follow the brief directly. Review the result before reporting.
-<!-- installed-skill-agent-routing:end -->

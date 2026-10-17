@@ -1,0 +1,13 @@
+{
+  "name": "django-api-architect",
+  "version": "0.1.0",
+  "description": "Django REST Framework skills for a service layer architecture, with a workflow agent",
+  "author": { "name": "KinWise Limited" },
+  "license": "MIT",
+  "repository": "https://github.com/KinwiseNZ-DevOps/django-api-architect",
+  "keywords": ["agent-skills", "django", "drf"],
+  "agents": [
+    "./resources/agents/claude-code/skill-specific/django-api-architect-workflow.md",
+    "./resources/agents/claude-code/skill-specific/django-api-architect-debugger.md"
+  ]
+}
