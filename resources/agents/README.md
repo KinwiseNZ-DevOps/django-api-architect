@@ -1,13 +1,13 @@
 # Optional agent profiles
 
-Agent profiles are optional. Store host-native definitions in a folder named for the host, then under `shared/` or `skill-specific/`. The installer looks for `*.agent.md` files in these folders. If none are supplied for a host, it reports that there is nothing to install and creates no agent folders in the target project.
+Agent profiles are optional. Store host-native definitions in a folder named for the host, then under `shared/` or `skill-specific/`. Each host may have at most two profiles: one skill-specific main workflow profile and one optional helper. Put planning, implementation, debugging, and review modes in sections of the main profile. If no profiles are supplied for a host, the installer creates no agent folders in the target project.
 
 ```text
 resources/agents/<host>/shared/shared-<role>.agent.md
 resources/agents/<host>/skill-specific/<skill-slug>-<role>.agent.md
 ```
 
-Use `shared/` for reusable agents that should be present in every skills repo, such as a code style reviewer. Keep their names in the `shared-` namespace and maintain the same definition across repos. Use `skill-specific/` for agents that carry one skill's workflow. Prefix the file name and every host-visible name or ID with the owning skill slug and role, such as `django-api-architect-debugger`.
+Use `shared/` for a reusable helper that should be present in every skills repo, such as a code style reviewer. Keep its name in the `shared-` namespace and maintain the same definition across repos. Use `skill-specific/` for the main workflow profile and any repo-specific helper. Prefix the file name and every host-visible name or ID with the owning skill slug and role, such as `django-api-architect-workflow`.
 
 Supported host destinations are:
 

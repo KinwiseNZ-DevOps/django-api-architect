@@ -92,3 +92,9 @@ Finish every task with these five points, in this order:
 - After each user-side step, stop and wait for the user to say they are done before giving the next step. Do not stack several manual steps in one reply. Reason: one task at a time keeps confirmation honest and lets problems surface at the step that caused them.
 - No padding, no restating the question, no caveats that carry no information.
 - Skip em dashes and en dashes entirely and always. They are banned in every reply, every file, every commit message, prose and code comments alike. Every dash in text must be a plain hyphen (-). If a hyphen does not fit, use a comma or rewrite the sentence. Reason: nothing justifies an em dash; a banned character that appears anywhere is a single, checkable, zero-tolerance rule.
+
+<!-- installed-skill-agent-routing:start -->
+## Installed skill agent dispatch
+
+When a task matches a role brief in `agents/codex/`, read the matching brief and use it with the relevant skill instructions. Use native subagent delegation when available; otherwise follow the brief directly. Review the result before reporting.
+<!-- installed-skill-agent-routing:end -->
