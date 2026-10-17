@@ -55,8 +55,8 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 
 ## Known deliberate states (dated)
 
-- 2026-10-17: `SETUP.md`, `templates/`, `reference-content/` and `skills/example-skill/` still exist. Reason: the owner will audit the built skills before shipping; the ship checklist in `SETUP.md` deletes them afterwards.
-- 2026-10-17: the repository was pushed with that scaffolding still present so the owner's uncommitted audit material (the BRIEF, sources and strip terms) survives in git history. Reason: deleting it before a committed push would be unrecoverable data loss. The scaffolding deletions are a deliberate follow-up commit after the owner's audit, after which the validator's ship checks enforce their absence.
+- 2026-10-17: `SETUP.md`, `templates/` and `skills/example-skill/` still exist. Reason: the owner will audit the built skills before shipping; the ship checklist in `SETUP.md` deletes them afterwards. `reference-content/` is not present in the repo: it was removed from the push as soon as the owner flagged that it must not be public, and the material now lives outside the repository at `_archive/django-api-architect-reference-content/` for the audit.
+- 2026-10-17: the first push briefly contained `reference-content/` in commit 15fbaa6. Reason: it was committed to preserve audit material before the restriction was raised. Its removal from history is a separate, force-push decision recorded above.
 
 ## Anti-drift close-out
 
