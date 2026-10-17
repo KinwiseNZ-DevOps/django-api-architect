@@ -48,6 +48,8 @@ Seven skills that let a coding agent build, review and extend Django REST API pr
 
 Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a project with `python scripts/install_agents.py --host claude-code --target PATH`. Other compatible hosts receive the skills only. The installer adds profiles to existing host agent folders and preserves unrelated files.
 
+---
+
 <a id="skills"></a>
 ## 🧩 Skills
 
@@ -62,6 +64,8 @@ Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a proj
 | [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
 | [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
 <!-- catalogue:end -->
+
+---
 
 <a id="how-they-fit-together"></a>
 ## 🗺️ How they fit together
@@ -79,10 +83,14 @@ flowchart TD
 
 Route first with django-api-architect, then work in dependency order: structure, services and selectors, APIs, auth and tasks, tests throughout.
 
+---
+
 <a id="optional-django-admin-theme"></a>
 ## Optional Django admin theme
 
 For projects that also need a modern Django admin interface, [Unfold](https://unfoldadmin.com/) is an optional theme for dashboards and internal tools. It is separate from the API architecture taught here. Use the [Django REST framework documentation](https://www.django-rest-framework.org/) and [Django 6.1 documentation](https://docs.djangoproject.com/en/6.1/) for framework behaviour. The service-layer approach is a project choice informed by the [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide), not a Django requirement.
+
+---
 
 <a id="install"></a>
 ## 📦 Install
@@ -96,6 +104,8 @@ Copy or symlink the `skills/` subfolders you want into your agent's skills direc
 |---|---|
 | Claude Code | `~/.claude/skills/` or a project's `.claude/skills/` |
 | Codex, Cursor, Copilot, OpenCode, Windsurf | the agent's own SKILL.md discovery path |
+
+---
 
 <a id="usage"></a>
 ## 🚀 Usage
@@ -125,12 +135,16 @@ Copy or symlink the `skills/` subfolders you want into your agent's skills direc
 > [!NOTE]
 > Skills also trigger on their own when your request matches. In Claude Code you can also invoke one explicitly with `/<skill-name>`, but the plain phrases above are shorter and work across every agent.
 
+---
+
 <a id="host-agent-profiles"></a>
 ## Host agent profiles
 
 When a skill is invoked, its router selects a suitable agent by task type when the host supports agent profiles or delegation. [django-api-architect-implementer](.github/agents/django-api-architect-implementer.agent.md) handles API design and implementation; [django-api-architect-debugger](.github/agents/django-api-architect-debugger.agent.md) handles bug reports and root-cause investigations. Prefixing each role with the skill slug helps avoid name clashes when profiles are installed alongside agents from other skills.
 
 Host profiles are provided for [GitHub Copilot](.github/agents/) and [Claude Code](.claude/agents/). Codex role briefs are provided in [agents/codex/](agents/codex/); Codex reads them when the router skill directs it, and can use native subagent delegation when the runtime provides it. The Codex briefs are prompt templates, not automatically discovered profiles. Other SKILL.md-compatible hosts can follow the router skill directly or use the role briefs as prompt material. Copy the relevant host profiles into the project where you install the skills; installing a skill alone does not install host agent profiles.
+
+---
 
 <a id="validate"></a>
 ## ✅ Validate
@@ -140,6 +154,8 @@ python scripts/skills_tool.py check
 ```
 
 Checks: frontmatter, name/folder match, description length and trigger, body under 500 lines, relative links resolve, at least 3 eval cases per skill, catalogue freshness, and no em or en dashes. After the starter skill is deleted it also rejects leftover placeholders and setup scaffolding. Stdlib only, no dependencies.
+
+---
 
 <a id="layout"></a>
 ## 🗂️ Layout
@@ -160,6 +176,8 @@ AGENTS.md                    agent-facing rules for this repo
 
 </details>
 
+---
+
 <a id="credits"></a>
 ## 🙏 Credits
 
@@ -168,6 +186,8 @@ Details in the skills are checked against the official documentation, linked fro
 - [Django REST framework](https://www.django-rest-framework.org/): permissions and throttling behaviour.
 - [Django documentation](https://docs.djangoproject.com/en/6.1/): transactions and `on_commit`.
 - [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide): the service and selector layer theory.
+
+---
 
 <a id="status-and-limits"></a>
 ## 📌 Status and limits
