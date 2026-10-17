@@ -12,6 +12,10 @@ description: >
 
 Stance: APIs are frozen as thin interfaces: one APIView class per operation, validate, delegate, serialise. Serialisation strategy is flexible as long as input and output stay separate.
 
+## Agent dispatch
+
+Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
+
 ## Gate
 
 | Situation | Action |

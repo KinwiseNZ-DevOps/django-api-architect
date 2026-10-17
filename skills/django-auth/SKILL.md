@@ -13,6 +13,10 @@ description: >
 
 Stance: JWT via `rest_framework_simplejwt` is the primary flow for SPA clients; OTP codes are the passwordless flow; the admin carries its own OTP second factor. Library views are wrapped, never reimplemented.
 
+## Agent dispatch
+
+Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
+
 ## Gate
 
 | Situation | Action |

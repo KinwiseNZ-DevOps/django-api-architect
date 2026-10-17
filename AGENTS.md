@@ -41,6 +41,9 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 ## Repository map
 
 - `skills/<name>/SKILL.md`: the only source of skill content. Folder name equals frontmatter `name`.
+- `.github/agents/*.agent.md`: optional GitHub Copilot agents that run workflows using these skills.
+- `.claude/agents/*.md`: Claude Code project agents for the same workflows.
+- `agents/codex/*.md`: Codex role briefs. The router skill selects a brief by task type; Codex uses native subagent delegation when the runtime provides it, and otherwise follows the brief directly. These are prompt templates, not automatically discovered Codex profiles.
 - New skills follow the house format that existing skills embody: folder name equals frontmatter `name`; frontmatter, gate, steps, hard rules.
 - `reference-content/` is git-ignored and never committed: it holds private source material and the names being stripped. Reason: once pushed to a public repo it cannot be recalled.
 - Custom to this repo:

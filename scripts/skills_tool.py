@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SKILLS = ROOT / "skills"
 README = ROOT / "README.md"
 EVALS = ROOT / "evals" / "cases.jsonl"
+AGENT_SOURCES = ROOT / "resources" / "agents"
 BEGIN, END = "<!-- catalogue:begin -->", "<!-- catalogue:end -->"
 BADGE_RE = re.compile(r"(badge/agent_skills-)(\d+|<N>)(-)")
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
@@ -104,6 +105,27 @@ def validate():
                 errors.append(f"{n}: {c} eval cases < {MIN_EVALS}")
     else:
         errors.append("evals/cases.jsonl missing")
+    return errors
+
+
+def validate_agent_sources():
+    errors = []
+    scopes = {
+        "shared": lambda stem: stem.startswith("shared-"),
+        "skill-specific": lambda stem: any(stem.startswith(f"{path.name}-") for path in skill_dirs()),
+    }
+    if not AGENT_SOURCES.is_dir():
+        return errors
+    for host in sorted(path for path in AGENT_SOURCES.iterdir() if path.is_dir()):
+        for scope, matches in scopes.items():
+            folder = host / scope
+            if not folder.is_dir():
+                continue
+            for path in sorted(folder.glob("*.md")):
+                stem = path.name[:-len(".agent.md")] if path.name.endswith(".agent.md") else path.stem
+                if not matches(stem):
+                    expected = "shared-<role>" if scope == "shared" else "<owning-skill-name>-<role>"
+                    errors.append(f"{path.relative_to(ROOT)}: name must use {expected}")
     return errors
 
 
@@ -204,6 +226,7 @@ def main():
     skipped = False
     if cmd in ("validate", "check"):
         errors += validate()
+        errors += validate_agent_sources()
         errors += dashes()
         errors += strip_terms()
         ship_errors, skipped = ship_checks()

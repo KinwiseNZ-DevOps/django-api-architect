@@ -12,6 +12,10 @@ description: >
 
 Stance: the pytest layout and the mock boundaries are frozen; what counts as enough coverage per layer follows the layer's own skill. Tests mirror the module structure.
 
+## Agent dispatch
+
+Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
+
 ## Gate
 
 | Situation | Action |

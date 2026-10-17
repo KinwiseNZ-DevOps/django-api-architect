@@ -27,11 +27,18 @@ Route by the layer the task actually touches. When in doubt, ask which file the 
 | Login, tokens, OTP, authentication wiring | [django-auth](../django-auth/SKILL.md) |
 | Celery tasks, retries, periodic tasks, webhook dispatch | [django-celery](../django-celery/SKILL.md) |
 
+## Agent selection
+
+When this skill or one of its sibling skills is invoked, inspect the agents available to the current runtime. In this repository, use the host profile when available: GitHub Copilot profiles are in `.github/agents/`, Claude Code profiles are in `.claude/agents/`, and Codex role briefs are in `agents/codex/`. Their names use the `django-api-architect-` prefix to reduce clashes with agents from other skills. Choose `django-api-architect-debugger` for a reported bug, failing behaviour, or root-cause investigation. Choose `django-api-architect-implementation-planner` when the user requests a plan without implementation. Give it the request and relevant skills, then review its plan. Choose `django-api-architect-implementer` for API design, implementation, review, or other skill work. Give the selected agent the user's request and the matching skill instructions, then have it carry the work through the workflow in its profile. Review the result against the relevant skill's hard rules before reporting back.
+
+Use this delegation when the runtime can start or hand off to an available agent. Codex runtimes without project agent profiles should read the matching role brief and use native subagent delegation when available. If no matching agent is discoverable or the runtime cannot invoke one, carry out the same workflow directly with the routed skill. Do not stop to ask the user to choose an agent.
+
 ## Steps
 
-1. **Detect.** Identify the layer: an interface (API, task, command), the core (services, selectors, models), or structure (apps, settings). Locate the target file using the pack shape: every app has `models.py`, `selectors.py`, `services.py`, `apis.py`, `tasks.py`, `urls.py`, `tests/`.
-2. **Route.** Hand the work to the matching skill and follow it. If the change spans layers, do them in dependency order: structure, then services and selectors, then APIs, then tests.
-3. **Verify.** Apply the shared hard rules below, then the routed skill's own verification.
+1. **Select an agent.** Apply the agent selection rules above. If the runtime cannot delegate, continue the same workflow directly.
+2. **Detect.** Identify the layer: an interface (API, task, command), the core (services, selectors, models), or structure (apps, settings). Locate the target file using the pack shape: every app has `models.py`, `selectors.py`, `services.py`, `apis.py`, `tasks.py`, `urls.py`, `tests/`.
+3. **Route.** Give the selected agent the matching specialist skill and follow its workflow. If the change spans several layers, work in dependency order: structure, then services and selectors, then APIs, then tests.
+4. **Verify.** Apply the shared hard rules below, then the routed skill's own verification. Review delegated work before returning the result.
 
 ## Hard rules
 

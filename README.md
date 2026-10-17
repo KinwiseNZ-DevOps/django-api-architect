@@ -31,6 +31,8 @@
 
 Seven skills that let a coding agent build, review and extend Django REST API projects with confidence: app packs and project structure, thin DRF APIs with a stable error contract, a service and selector layer, pytest conventions, JWT and OTP authentication, and Celery task wiring. They follow the open [Agent Skills](https://agentskills.io/specification) format and work in Claude Code, Codex, Cursor, Copilot, OpenCode, or any SKILL.md-compatible agent. They are grounded in a production Django API starter (team-written) and the public [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide) (credited as supporting theory).
 
+Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a project with `python scripts/install_agents.py --host claude-code --target PATH`. Other compatible hosts receive the skills only. The installer adds profiles to existing host agent folders and preserves unrelated files.
+
 ## 🧩 Skills
 
 <!-- catalogue:begin -->
@@ -74,7 +76,7 @@ Copy or symlink the `skills/` subfolders you want into your agent's skills direc
 | Agent | Where skills live |
 |---|---|
 | Claude Code | `~/.claude/skills/` or a project's `.claude/skills/` |
-| Codex · Cursor · Copilot · OpenCode · Windsurf | the agent's own SKILL.md discovery path |
+| Codex, Cursor, Copilot, OpenCode, Windsurf | the agent's own SKILL.md discovery path |
 
 ## 🚀 Usage
 
@@ -103,6 +105,12 @@ Copy or symlink the `skills/` subfolders you want into your agent's skills direc
 > [!NOTE]
 > Skills also trigger on their own when your request matches. In Claude Code you can also invoke one explicitly with `/<skill-name>`, but the plain phrases above are shorter and work across every agent.
 
+## Host agent profiles
+
+When a skill is invoked, its router selects a suitable agent by task type when the host supports agent profiles or delegation. [django-api-architect-implementer](.github/agents/django-api-architect-implementer.agent.md) handles API design and implementation; [django-api-architect-debugger](.github/agents/django-api-architect-debugger.agent.md) handles bug reports and root-cause investigations. Prefixing each role with the skill slug helps avoid name clashes when profiles are installed alongside agents from other skills.
+
+Host profiles are provided for [GitHub Copilot](.github/agents/) and [Claude Code](.claude/agents/). Codex role briefs are provided in [agents/codex/](agents/codex/); Codex reads them when the router skill directs it, and can use native subagent delegation when the runtime provides it. The Codex briefs are prompt templates, not automatically discovered profiles. Other SKILL.md-compatible hosts can follow the router skill directly or use the role briefs as prompt material. Copy the relevant host profiles into the project where you install the skills; installing a skill alone does not install host agent profiles.
+
 ## ✅ Validate
 
 ```bash
@@ -117,11 +125,14 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 <summary>Repository layout</summary>
 
 ```
-skills/<name>/SKILL.md      one folder per skill (+ references/ where needed)
-evals/cases.jsonl           3+ behavioural cases per skill
-scripts/skills_tool.py      validate, regenerate catalogue (stdlib only)
-.github/workflows/          CI runs `skills_tool.py check` (free on public repos)
-AGENTS.md                   agent-facing rules for this repo
+skills/<name>/SKILL.md       one folder per skill (+ references/ where needed)
+.github/agents/*.agent.md    optional GitHub Copilot agents
+.claude/agents/*.md          optional Claude Code project agents
+agents/codex/*.md            Codex role briefs for runtime delegation
+evals/cases.jsonl            3+ behavioural cases per skill
+scripts/skills_tool.py       validate, regenerate catalogue (stdlib only)
+.github/workflows/           CI runs `skills_tool.py check` (free on public repos)
+AGENTS.md                    agent-facing rules for this repo
 ```
 
 </details>

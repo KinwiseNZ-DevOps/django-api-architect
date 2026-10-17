@@ -13,6 +13,10 @@ description: >
 
 Stance: services write, selectors read, and both are plain functions with keyword-only arguments. Class-based services are the exception, for multi-step flows or shared helper namespaces.
 
+## Agent dispatch
+
+Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
+
 ## Gate
 
 | Situation | Action |
