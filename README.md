@@ -26,13 +26,6 @@
 
 </div>
 
-> [!IMPORTANT]
-> **Principle: business logic lives in services and selectors; APIs, serializers and models stay thin interfaces over it.**
-
-Seven skills that let a coding agent build, review and extend Django REST API projects with confidence: app packs and project structure, thin DRF APIs with a stable error contract, a service and selector layer, pytest conventions, JWT and OTP authentication, and Celery task wiring. They follow the open [Agent Skills](https://agentskills.io/specification) format and work in Claude Code, Codex, Cursor, Copilot, OpenCode, or any SKILL.md-compatible agent. They are grounded in a production Django API starter (team-written) and the public [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide) (credited as supporting theory).
-
-Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a project with `python scripts/install_agents.py --host claude-code --target PATH`. Other compatible hosts receive the skills only. The installer adds profiles to existing host agent folders and preserves unrelated files.
-
 Table of contents:
 
 - [Skills](#skills)
@@ -45,6 +38,15 @@ Table of contents:
 - [Layout](#layout)
 - [Credits](#credits)
 - [Status and limits](#status-and-limits)
+
+---
+
+> [!IMPORTANT]
+> **Principle: business logic lives in services and selectors; APIs, serializers and models stay thin interfaces over it.**
+
+Seven skills that let a coding agent build, review and extend Django REST API projects with confidence: app packs and project structure, thin DRF APIs with a stable error contract, a service and selector layer, pytest conventions, JWT and OTP authentication, and Celery task wiring. They follow the open [Agent Skills](https://agentskills.io/specification) format and work in Claude Code, Codex, Cursor, Copilot, OpenCode, or any SKILL.md-compatible agent. They are grounded in a production Django API starter (team-written) and the public [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide) (credited as supporting theory).
+
+Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a project with `python scripts/install_agents.py --host claude-code --target PATH`. Other compatible hosts receive the skills only. The installer adds profiles to existing host agent folders and preserves unrelated files.
 
 <a id="skills"></a>
 ## 🧩 Skills
