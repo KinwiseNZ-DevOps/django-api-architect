@@ -32,13 +32,15 @@ FROM deps AS deps-dev
 COPY requirements/dev.txt requirements/dev.txt
 RUN /opt/venv/bin/pip install -r requirements/dev.txt
 
-# Development target: source is bind-mounted or synced by Compose.
+# Development target: source is copied so one-off services work without a
+# mount; Compose bind-mounts or syncs the live source over it for hot reload.
 FROM base AS dev
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libpq5 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=deps-dev /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+COPY --chown=app:app . .
 USER app
 EXPOSE 8000
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
@@ -61,6 +63,7 @@ CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers
 Notes on the choices:
 
 - The final stage is `runtime`. Build the development image with `docker build --target dev .`. BuildKit builds only the stages the chosen target depends on.
+- The `dev` target copies the source as well as expecting a mount. Services that run without a bind mount, such as a one-off `migrate`, then still find `manage.py`; services with the mount see live edits.
 - `useradd` runs in `base`, so every stage that uses `USER app` shares the same fixed UID and GID.
 - The health check uses Python from the image, so it needs no `curl`. It needs a lightweight `/health/` route and `127.0.0.1` in `ALLOWED_HOSTS`. If the project has no health route, adding one is an API-layer change: a thin view that returns 200 and holds no business logic.
 - `libpq5` is the PostgreSQL client library the runtime needs. `libpq-dev` and `build-essential` are only needed to compile packages in the `deps` stage.
@@ -84,6 +87,9 @@ __pycache__
 media
 staticfiles
 *.sqlite3
+compose*.yaml
+compose*.yml
+docker-compose*.yaml
 docker-compose*.yml
 Dockerfile
 ```
