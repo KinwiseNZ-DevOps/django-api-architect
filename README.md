@@ -95,6 +95,7 @@ scripts/skills_tool.py      validate, regenerate catalogue (stdlib only)
 .github/workflows/          CI runs `skills_tool.py check` (free on public repos)
 AGENTS.md                   agent-facing rules for this repo
 SETUP.md                    fill-in checklist; delete when done
+reference-content/          source material the skills are built from; delete when done
 ```
 
 </details>

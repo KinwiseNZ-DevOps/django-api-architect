@@ -10,6 +10,8 @@ This repo is a scaffold copied from the skills-repo template. Work top to bottom
 
 ## 2. Content
 
+- [ ] Build the reference content first (pipeline in `reference-content/README.md`): drop originals into `raw/`, list project-specific names in `strip-terms.txt`, convert each item into a general-purpose file in `sources/`, and fill in `BRIEF.md`
+- [ ] Build the skills from `BRIEF.md` and `sources/` only, never from `raw/`
 - [ ] Design the skill set first: write the list of skills, their scope boundaries, and which skill owns each nearby topic. Scope discipline beats breadth: prefer curation over accumulation
 - [ ] Write the first real skill from `templates/skill-template/SKILL.md`
 - [ ] Write its description as a trigger contract: what it does, when to use it, keywords users type, and negative triggers for topics owned by sibling skills
@@ -31,6 +33,7 @@ python scripts/skills_tool.py check       # must end: ok (N skills), with no "sh
 - [ ] Enable Actions in Settings; the workflow runs on pushes to `main` and PRs
 - [ ] Set the GitHub "About" description and add topics (`agent-skills` at minimum)
 - [ ] Delete `SETUP.md`
+- [ ] Delete `reference-content/` (setup-only; the validator fails if it remains)
 - [ ] Delete `templates/` (it is bootstrap scaffolding only; from now on, existing skills are the format reference, and `AGENTS.md` already reflects that)
 
 ## 5. Do not

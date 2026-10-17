@@ -5,7 +5,7 @@
   python scripts/skills_tool.py catalogue    # rewrite README catalogue block
   python scripts/skills_tool.py check        # validate + fail if catalogue is stale
 
-Dashes are always checked. Ship checks (placeholders, leftover scaffolding)
+Dashes are always checked (except in reference-content/, which holds raw source material). Ship checks (placeholders, leftover scaffolding)
 run once skills/example-skill has been deleted.
 """
 import json
@@ -110,7 +110,8 @@ def validate():
 def dashes():
     errors = []
     for p in sorted(ROOT.rglob("*")):
-        if not p.is_file() or ".git" in p.relative_to(ROOT).parts:
+        parts = p.relative_to(ROOT).parts
+        if not p.is_file() or ".git" in parts or parts[0] == "reference-content":
             continue
         try:
             lines = p.read_text(encoding="utf-8").splitlines()
@@ -119,6 +120,33 @@ def dashes():
         for i, line in enumerate(lines, 1):
             if any(d in line for d in BANNED_DASHES):
                 errors.append(f"{p.relative_to(ROOT)}:{i}: em or en dash (use a hyphen)")
+    return errors
+
+
+def strip_terms():
+    f = ROOT / "reference-content" / "strip-terms.txt"
+    if not f.exists():
+        return []
+    terms = [l.strip().lower() for l in f.read_text(encoding="utf-8").splitlines()
+             if l.strip() and not l.lstrip().startswith("#")]
+    if not terms:
+        return []
+    targets = [ROOT / n for n in ("README.md", "AGENTS.md")]
+    for folder in ("skills", "evals", "reference-content/sources"):
+        d = ROOT / folder
+        if d.is_dir():
+            targets += [x for x in d.rglob("*") if x.is_file()]
+    errors = []
+    for x in targets:
+        try:
+            lines = x.read_text(encoding="utf-8").splitlines()
+        except (UnicodeDecodeError, FileNotFoundError):
+            continue
+        for i, line in enumerate(lines, 1):
+            low = line.lower()
+            for term in terms:
+                if term in low:
+                    errors.append(f"{x.relative_to(ROOT)}:{i}: project-specific term '{term}' (see strip-terms.txt)")
     return errors
 
 
@@ -138,7 +166,7 @@ def ship_checks():
                     continue
                 if " " in inner or inner[0].isupper():
                     errors.append(f"{rel}:{i}: leftover placeholder <{inner}>")
-    for leftover in ("SETUP.md", "templates"):
+    for leftover in ("SETUP.md", "templates", "reference-content"):
         if (ROOT / leftover).exists():
             errors.append(f"{leftover}: setup scaffolding still present (delete before shipping)")
     return errors, False
@@ -177,6 +205,7 @@ def main():
     if cmd in ("validate", "check"):
         errors += validate()
         errors += dashes()
+        errors += strip_terms()
         ship_errors, skipped = ship_checks()
         errors += ship_errors
     if cmd == "catalogue":
