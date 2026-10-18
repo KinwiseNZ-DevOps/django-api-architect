@@ -415,7 +415,7 @@ def dashes():
     errors = []
     for p in sorted(ROOT.rglob("*")):
         parts = p.relative_to(ROOT).parts
-        if not p.is_file() or ".git" in parts or parts[0] == "reference-content":
+        if not p.is_file() or ".git" in parts or parts[0] == "reference-content" or parts[:3] == ("quality", "evals", "results"):
             continue
         if any(dash in p.name for dash in BANNED_DASHES):
             errors.append(f"{p.relative_to(ROOT)}: em or en dash in the file name (use a hyphen)")

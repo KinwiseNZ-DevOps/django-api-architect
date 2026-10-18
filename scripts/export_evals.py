@@ -57,6 +57,8 @@ def render(cases):
         files[f"{name}/graders/criteria.md"] = (
             "---\ntype: llm\n---\n\n"
             f"{MARKER}\n\n"
+            "The agent in this run can read and search files but cannot write them, so judge what it says it would do\n"
+            "and what it proposes, not files it created.\n\n"
             "PASS if the response does all of the following:\n"
             f"{rubric}\n\n"
             "FAIL if any of them is missing, or if the response does the opposite of one.\n"
