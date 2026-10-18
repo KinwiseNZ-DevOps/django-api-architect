@@ -27,6 +27,7 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
 ## Steps
 
 1. **Detect.** Find `<app>/tests/`. Confirm the layout: `test_services.py`, `test_selectors.py`, `test_apis.py`, `test_models.py`, `test_tasks.py`, plus dedicated files for special surfaces (webhooks, admin). Classes are `Test<Thing>` with plain asserts; database tests carry `@pytest.mark.django_db`.
+   If the project has no pytest setup, add it first and keep it small: `pytest` and `pytest-django` in the dev requirements (ask before adding a dependency), a `pytest.ini` with `DJANGO_SETTINGS_MODULE = config.settings.test` and `python_files = test_*.py`, and a root `conftest.py` holding an `api_client` fixture (`rest_framework.test.APIClient`) and the shared user fixture. Mechanism: without `DJANGO_SETTINGS_MODULE` pytest-django cannot start, and the first run fails before any test executes.
 2. **Fix.** Write tests by layer:
    - Services: exhaustive coverage of the business logic, hitting the database, with task calls and everything outside the project mocked. Patch at the point of use (`apps.billing.services.stripe.Customer.create`), not at the provider's own module.
    - Selectors: coverage of filtering and ownership scoping; verify a caller cannot fetch another user's rows.

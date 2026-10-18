@@ -42,6 +42,10 @@ Use this delegation when the runtime can start or hand off to an available agent
 3. **Route.** Give the workflow the matching specialist skill and follow its workflow. If the change spans several layers, work in dependency order: structure, then services and selectors, then APIs, then tests.
 4. **Verify.** Apply the shared hard rules below, then the routed skill's own verification. Review delegated work before returning the result.
 
+## When the project does not have the shape yet
+
+These skills assume a shared package for the error handler and pagination, app manifests, a settings package, drf-spectacular and pytest configured. Check for each before relying on it. If one is missing, say so in one line and follow the project's own way of doing that job; add the missing piece only when the task needs it, keep it minimal, and ask first when it needs a new dependency. Mechanism: copying the default structure into a project that does not have it creates a second, half-used convention that nothing else follows.
+
 ## Hard rules
 
 - Business logic never goes in APIs, views, serializers, forms, model `save`, custom managers or signals. Mechanism: symptom is logic that cannot be traced or tested in one place; cause is logic scattered across interface layers; fix is a service or selector with keyword-only arguments.
