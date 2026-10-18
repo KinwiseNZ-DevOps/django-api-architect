@@ -1,5 +1,7 @@
 # Dockerfile example for a Django API
 
+Contents: Dockerfile, .dockerignore, verification commands, sources
+
 Adapt names and paths to the project. The layout assumes `requirements/base.txt` and `requirements/dev.txt`, a settings package at `config/`, and a WSGI entry point at `config.wsgi:application`. Projects that use another dependency tool (uv, poetry, pip-tools) keep the same stage structure and change only the install lines.
 
 ## Dockerfile

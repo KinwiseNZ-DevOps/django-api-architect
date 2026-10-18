@@ -5,7 +5,7 @@
   python scripts/skills_tool.py catalogue    # rewrite README catalogue block
   python scripts/skills_tool.py check        # validate + fail if catalogue is stale
 
-Plugin manifests in .claude-plugin/, agent profile contents and the manifest agents list are checked on every run. Dashes are always checked in text files outside reference-content/, which holds raw source material. Ship checks for placeholders and setup-only paths in the Git index run once skills/example-skill has been deleted.
+Quality rules from the Agent Skills spec (allowed frontmatter, third-person descriptions, reserved words, installed agent copies matching resources/agents) run on every check, with warnings for softer issues. Plugin manifests in .claude-plugin/, agent profile contents and the manifest agents list are checked on every run. Dashes are always checked in text files outside reference-content/, which holds raw source material. Ship checks for placeholders and setup-only paths in the Git index run once skills/example-skill has been deleted.
 """
 import json
 import re
@@ -331,6 +331,82 @@ def validate_plugin():
     return errors
 
 
+ALLOWED_FRONTMATTER = {
+    "name", "description", "license", "compatibility", "metadata", "allowed-tools",
+    "disable-model-invocation", "user-invocable", "argument-hint", "model", "effort", "context", "agent",
+    "hooks", "paths", "shell", "when_to_use", "arguments",
+}
+RESERVED_SKILL_WORDS = ("anthropic", "claude")
+FIRST_PERSON_RE = re.compile(r"^\s*(I|I'm|I can|You|You can|We|My|Your)\b")
+USE_TRIGGER_RE = re.compile(r"\bUse (when|for|this|it)\b")
+MAX_COMPATIBILITY = 500
+LONG_REFERENCE_LINES = 100
+CONTENTS_RE = re.compile(r"(?i)\b(contents|table of contents)\b")
+BACKSLASH_LINK_RE = re.compile(r"\]\([^)\s]*\\[^)\s]*\)")
+INSTALLED_AGENT_DIRS = {"claude-code": ".claude/agents", "github-copilot": ".github/agents"}
+
+
+def validate_quality():
+    """Soft and hard checks drawn from the Agent Skills spec and Anthropic's authoring guidance.
+
+    Returns (errors, warnings). Warnings never fail the run; they flag things worth a human look."""
+    errors, warnings = [], []
+    dirs = skill_dirs()
+    for d in dirs:
+        f = d / "SKILL.md"
+        if not f.exists():
+            continue
+        fm, body = parse(f)
+        if fm is None:
+            continue
+        for key in fm:
+            if key not in ALLOWED_FRONTMATTER:
+                errors.append(f"{d.name}: frontmatter key '{key}' is not in the Agent Skills spec or the Claude Code extras")
+        name, desc = fm.get("name", ""), fm.get("description", "")
+        if any(word in name for word in RESERVED_SKILL_WORDS):
+            errors.append(f"{d.name}: skill names must not contain the reserved words {RESERVED_SKILL_WORDS}")
+        if desc and FIRST_PERSON_RE.match(desc):
+            errors.append(f"{d.name}: description must be third person, not 'I' or 'You'")
+        if desc and not USE_TRIGGER_RE.search(desc):
+            errors.append(f"{d.name}: description needs a 'Use when ...' or 'Use for ...' trigger")
+        if len(dirs) > 1 and desc and not re.search(r"\b[Dd]o not\b|\b[Nn]ot for\b|\b[Dd]on't\b|\b[Nn]ever\b", desc):
+            warnings.append(f"{d.name}: description has no negative trigger ('Do not use for ...'); siblings can steal its requests")
+        if len(fm.get("compatibility", "")) > MAX_COMPATIBILITY:
+            errors.append(f"{d.name}: compatibility is over {MAX_COMPATIBILITY} characters")
+        reference_dir = d / "references"
+        for md in sorted(d.rglob("*.md")):
+            text = read_text(md) or ""
+            if BACKSLASH_LINK_RE.search(text):
+                errors.append(f"{md.relative_to(ROOT).as_posix()}: link uses a backslash path; use forward slashes")
+            if md.parent == reference_dir:
+                lines = text.splitlines()
+                if len(lines) > LONG_REFERENCE_LINES and not any(CONTENTS_RE.search(line) for line in lines[:12]):
+                    warnings.append(f"{md.relative_to(ROOT).as_posix()}: {len(lines)} lines with no contents line near the top")
+                for target in LINK_RE.findall(text):
+                    rel = target.split("#")[0]
+                    if rel.endswith(".md") and (md.parent / rel).resolve().parent == reference_dir.resolve():
+                        warnings.append(f"{md.relative_to(ROOT).as_posix()}: links to another reference file ({rel}); keep references one level deep")
+    changelog = ROOT / "CHANGELOG.md"
+    manifest = PLUGIN_DIR / "plugin.json"
+    if changelog.exists() and manifest.exists():
+        version = (load_json(manifest)[0] or {}).get("version", "")
+        if version and "<" not in version and f"[{version}]" not in (read_text(changelog) or ""):
+            warnings.append(f"CHANGELOG.md has no [{version}] section; run scripts/bump_version.py when releasing")
+    for host, installed in INSTALLED_AGENT_DIRS.items():
+        folder = ROOT / installed
+        if not folder.is_dir():
+            continue
+        for path in sorted(folder.glob("*.md")):
+            sources = [p for p in agent_profiles(host) if p.name == path.name]
+            if not sources:
+                continue
+            a = (read_text(path) or "").replace("\r\n", "\n")
+            b = (read_text(sources[0]) or "").replace("\r\n", "\n")
+            if a != b:
+                errors.append(f"{path.relative_to(ROOT).as_posix()}: differs from {sources[0].relative_to(ROOT).as_posix()}; the source in resources/agents is canonical, copy it over")
+    return errors, warnings
+
+
 def dashes():
     errors = []
     for p in sorted(ROOT.rglob("*")):
@@ -515,6 +591,7 @@ def validate_always_on():
 def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
     errors = []
+    warnings = []
     skipped = False
     if cmd in ("validate", "check"):
         errors += validate()
@@ -522,6 +599,8 @@ def main():
         errors += validate_agent_contents()
         errors += validate_plugin()
         errors += validate_always_on()
+        quality_errors, warnings = validate_quality()
+        errors += quality_errors
         errors += dashes()
         errors += strip_terms()
         ship_errors, skipped = ship_checks()
@@ -533,6 +612,8 @@ def main():
     if cmd not in ("validate", "catalogue", "check"):
         print(__doc__)
         return 2
+    for w in warnings:
+        print("WARN:", w)
     for e in errors:
         print("ERROR:", e)
     note = " [ship checks skipped: example-skill present]" if skipped else ""

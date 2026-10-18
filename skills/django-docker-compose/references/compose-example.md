@@ -1,5 +1,7 @@
 # Compose example for a Django API
 
+Contents: compose.yaml, hot reload options, .env.example, command cheat sheet
+
 Adapt service names, the settings module, the Celery app path (`config`) and ports to the project. This file is for local development.
 
 ## compose.yaml
