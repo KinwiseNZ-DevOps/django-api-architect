@@ -9,5 +9,6 @@
   "agents": [
     "./resources/agents/claude-code/skill-specific/django-api-architect-workflow.md",
     "./resources/agents/claude-code/skill-specific/django-api-architect-debugger.md"
-  ]
+  ],
+  "experimental": { "evals": "quality/evals" }
 }

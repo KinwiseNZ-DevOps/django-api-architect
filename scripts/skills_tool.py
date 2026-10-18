@@ -392,6 +392,10 @@ def validate_quality():
         version = (load_json(manifest)[0] or {}).get("version", "")
         if version and "<" not in version and f"[{version}]" not in (read_text(changelog) or ""):
             warnings.append(f"CHANGELOG.md has no [{version}] section; run scripts/bump_version.py when releasing")
+    if (ROOT / "quality" / "evals").exists() and (ROOT / "scripts" / "export_evals.py").exists():
+        stale = subprocess.run([sys.executable, str(ROOT / "scripts" / "export_evals.py"), "--check"], capture_output=True, text=True)
+        if stale.returncode:
+            warnings.append("quality/evals is out of date with evals/cases.jsonl; run scripts/export_evals.py")
     for host, installed in INSTALLED_AGENT_DIRS.items():
         folder = ROOT / installed
         if not folder.is_dir():
