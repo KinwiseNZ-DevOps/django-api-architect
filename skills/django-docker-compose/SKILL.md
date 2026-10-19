@@ -4,10 +4,11 @@ description: >
   Governs the local Docker Compose stack for Django API projects: web, Postgres,
   Redis, Celery worker and beat services, health-gated startup, one-off
   migration, env files and secrets, volumes, ports, hot reload and running tests
-  and management commands in containers. Use when writing or changing
-  docker-compose files, local environment setup, service startup order or
-  container-based dev and test commands. Do not use for the Dockerfile itself
-  (django-docker-images) or for production orchestration.
+  and management commands in containers. Use when writing or changing a
+  docker-compose file, fixing a container that starts before Postgres is ready,
+  putting passwords in compose files, or running docker compose down -v,
+  including when asked for the quick option. Do not use for the Dockerfile
+  itself (django-docker-images) or for production orchestration.
 ---
 
 # Django Docker Compose

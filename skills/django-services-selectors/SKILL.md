@@ -2,11 +2,12 @@
 name: django-services-selectors
 description: >
   Governs the service and selector layer: writing business logic, validation
-  placement, transactions, and update helpers. Use when writing or changing
-  services, selectors, model validation, or deciding where a piece of business
-  logic belongs. Do not use for API classes that call them
-  (django-apis-serializers) or for task retry and scheduling mechanics
-  (django-celery).
+  placement, transactions, and update helpers. Use when writing or changing a
+  service or selector, a refund or similar multi-step write, row-level filtering
+  or ownership checks, model validation, or deciding where a business rule
+  belongs, including when asked to duplicate a rule in a serializer or view. Do
+  not use for API classes that call them (django-apis-serializers) or for task
+  retry and scheduling mechanics (django-celery).
 ---
 
 # Django Services and Selectors

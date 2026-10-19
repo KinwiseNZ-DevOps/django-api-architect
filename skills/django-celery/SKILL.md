@@ -3,10 +3,10 @@ name: django-celery
 description: >
   Governs Celery task structure, retries, transaction-safe task triggering,
   webhook dispatch chains, periodic tasks and Celery configuration. Use when
-  writing or changing tasks, retry behaviour, task triggering inside
-  transactions, or webhook processing. Do not use for the business logic
-  tasks call (django-services-selectors) or the tests that cover them
-  (django-testing).
+  writing or changing a task, a retry policy, a .delay call inside a
+  transaction, a welcome or notification email trigger, or Stripe or other
+  webhook handling, including when asked to retry forever or to process a
+  webhook in the view. Do not use for the business logic tasks call (django-services-selectors) or the tests that cover them (django-testing).
 ---
 
 # Django Celery Tasks

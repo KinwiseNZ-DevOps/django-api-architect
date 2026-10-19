@@ -3,8 +3,9 @@ name: django-project-structure
 description: >
   Governs Django app layout, the app pack shape, app manifests, and settings
   organisation for service layer API projects. Use when creating an app or
-  feature pack, deciding where code belongs, wiring URLs, or organising
-  settings and environment variables. Do not use for the code inside APIs,
+  feature pack, deciding where code or a setting or an API key belongs, wiring
+  URLs, or organising settings and environment variables, including when asked
+  to put domain logic in a core app. Do not use for the code inside APIs,
   services or tests; those are owned by the sibling specialist skills.
 ---
 

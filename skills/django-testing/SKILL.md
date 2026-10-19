@@ -1,11 +1,12 @@
 ---
 name: django-testing
 description: >
-  Governs the test suite for Django API projects: pytest layout, what to test
-  at each layer, mocking boundaries, and test-state construction. Use when
-  writing, changing or reviewing tests, deciding what to mock, or adding
-  coverage for a service, selector, API or task. Do not use for writing the
-  production code the tests cover; that is owned by the sibling skills.
+  Governs the test suite for Django API projects: pytest layout, what to test at
+  each layer, mocking boundaries, and test-state construction. Use when
+  writing, changing or reviewing tests, deciding what to mock, adding coverage
+  for a service, selector, API or task, or setting up pytest, including when
+  asked to mock the ORM or to skip tests. Do not use for writing the production
+  code the tests cover; that is owned by the sibling skills.
 ---
 
 # Django Testing
