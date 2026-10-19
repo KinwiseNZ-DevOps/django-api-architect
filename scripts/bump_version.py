@@ -12,6 +12,7 @@ Claude Code keeps an installed plugin on its current version until `version` in
 needs a bump. This script edits plugin.json, the marketplace entry when it carries
 a version, and moves the "Unreleased" changelog notes under the new version.
 """
+
 import datetime
 import re
 import sys
@@ -51,11 +52,17 @@ def main():
     old, new = match.group(2), bumped(match.group(2), args[0])
     if new == old:
         sys.exit(f"ERROR: version is already {old}")
-    edits = {PLUGIN: VERSION_RE.sub(lambda m: f"{m.group(1)}{new}{m.group(3)}", text, count=1)}
+    edits = {
+        PLUGIN: VERSION_RE.sub(
+            lambda m: f"{m.group(1)}{new}{m.group(3)}", text, count=1
+        )
+    }
     if MARKETPLACE.exists():
         market = MARKETPLACE.read_text(encoding="utf-8")
         if VERSION_RE.search(market):
-            edits[MARKETPLACE] = VERSION_RE.sub(lambda m: f"{m.group(1)}{new}{m.group(3)}", market)
+            edits[MARKETPLACE] = VERSION_RE.sub(
+                lambda m: f"{m.group(1)}{new}{m.group(3)}", market
+            )
     if CHANGELOG.exists():
         log = CHANGELOG.read_text(encoding="utf-8")
         heading = f"## [{new}] - {datetime.date.today().isoformat()}"
@@ -65,12 +72,17 @@ def main():
             log = log.rstrip("\n") + f"\n\n{heading}\n"
         edits[CHANGELOG] = log
     for path, content in edits.items():
-        print(f"{'would update' if dry else 'updated'} {path.relative_to(ROOT).as_posix()}")
+        print(
+            f"{'would update' if dry else 'updated'} {path.relative_to(ROOT).as_posix()}"
+        )
         if not dry:
             path.write_text(content, encoding="utf-8", newline="\n")
     print(f"version {old} -> {new}")
     if not dry:
-        print("Next: run `python scripts/skills_tool.py check`, commit, then tag the commit v" + new)
+        print(
+            "Next: run `python scripts/skills_tool.py check`, commit, then tag the commit v"
+            + new
+        )
     return 0
 
 

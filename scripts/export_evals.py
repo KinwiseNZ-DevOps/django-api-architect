@@ -17,6 +17,7 @@ the cost):
 
 Do not edit quality/evals by hand. Change cases.jsonl and export again.
 """
+
 import json
 import shutil
 import sys
@@ -78,12 +79,25 @@ def main():
         stale = []
         for rel, text in files.items():
             path = OUT / rel
-            if not path.exists() or path.read_text(encoding="utf-8").replace("\r\n", "\n") != text:
+            if (
+                not path.exists()
+                or path.read_text(encoding="utf-8").replace("\r\n", "\n") != text
+            ):
                 stale.append(rel)
-        existing = {p.relative_to(OUT).as_posix() for p in OUT.rglob("*") if p.is_file() and "results" not in p.parts} if OUT.exists() else set()
+        existing = (
+            {
+                p.relative_to(OUT).as_posix()
+                for p in OUT.rglob("*")
+                if p.is_file() and "results" not in p.parts
+            }
+            if OUT.exists()
+            else set()
+        )
         stale += sorted(existing - set(files))
         if stale:
-            print("ERROR: quality/evals is out of date; run `python scripts/export_evals.py`:")
+            print(
+                "ERROR: quality/evals is out of date; run `python scripts/export_evals.py`:"
+            )
             for rel in stale[:10]:
                 print("  ", rel)
             return 1
