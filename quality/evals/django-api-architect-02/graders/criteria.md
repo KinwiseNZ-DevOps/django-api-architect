@@ -8,8 +8,8 @@ The agent in this run can read and search files but cannot write them, so judge 
 and what it proposes, not files it created.
 
 PASS if the response does all of the following:
-- Routes across layers in dependency order: service for the export logic, thin APIView for the endpoint, tests alongside
-- Follows the app pack shape when locating files (apis.py, services.py, urls.py)
-- Does not add business logic to the API class
+- Keeps the export logic out of the API class: a read-only export belongs in a selector (or a service if it writes), and the APIView stays thin
+- Follows the app pack shape when locating files (apis.py, selectors.py or services.py, urls.py) and routes across layers in dependency order
+- Mentions tests for the new endpoint
 
 FAIL if any of them is missing, or if the response does the opposite of one.
