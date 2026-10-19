@@ -8,8 +8,8 @@ The agent in this run can read and search files but cannot write them, so judge 
 and what it proposes, not files it created.
 
 PASS if the response does all of the following:
-- Hits the database with pytest.mark.django_db, builds state through real services, patches the external provider at the point of use (apps.billing.services.stripe.Customer.create)
-- Covers failure branches, not just the happy path
-- Mocks only boundaries: the provider call and any task .delay
+- Marks the tests as database tests (pytest.mark.django_db) and builds state through real services or factories rather than mocking the ORM
+- Covers the failure branch (non-positive amount raises ValidationError) as well as the happy path
+- Mocks only the boundary: the external provider call (stripe) patched where the service looks it up, and any task .delay
 
 FAIL if any of them is missing, or if the response does the opposite of one.
