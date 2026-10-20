@@ -21,7 +21,7 @@
 
 [![Validate skills](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml/badge.svg)](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Agent skills](https://img.shields.io/badge/agent_skills-10-8A2BE2)](https://agentskills.io)
+[![Agent skills](https://img.shields.io/badge/agent_skills-11-8A2BE2)](https://agentskills.io)
 [![Format](https://img.shields.io/badge/format-SKILL.md-orange)](https://agentskills.io/specification)
 [![Tooling](https://img.shields.io/badge/tooling-stdlib_only-success)](scripts/skills_tool.py)
 
@@ -66,6 +66,7 @@ Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a proj
 | [`django-open-banking`](skills/django-open-banking/SKILL.md) | Governs open banking integrations in Django API projects: initiating account-to-account payments and reading bank account data (balances, transactions) through a provider such as BlinkPay, behind a provider-agnostic interface so a second country or provider can be added without rewriting callers. |
 | [`django-project-structure`](skills/django-project-structure/SKILL.md) | Governs Django app layout, the app pack shape, app manifests, and settings organisation for service layer API projects. |
 | [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
+| [`django-subscriptions`](skills/django-subscriptions/SKILL.md) | Governs subscription lifecycle management in Django API projects: plans, activation, upgrades and downgrades, cancellation, and payment-failure handling (dunning), behind a provider-agnostic interface for the recurring billing processor (Stripe, PayPal, Apple App Store, Google Play, or similar). |
 | [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
 <!-- catalogue:end -->
 
@@ -86,6 +87,7 @@ flowchart TD
     R --> D1["🐳 django-docker-images<br/>Dockerfile, non-root, production server"]
     R --> D2["🧱 django-docker-compose<br/>local stack, health-gated startup, env files"]
     R --> OB["🏦 django-open-banking<br/>BlinkPay payments and account data, provider-agnostic"]
+    R --> SUB["🔁 django-subscriptions<br/>plans, lifecycle, webhook-driven state, dunning"]
 ```
 
 Route first with django-api-architect, then work in dependency order: structure, services and selectors, APIs, auth and tasks, tests throughout.

@@ -4,6 +4,10 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-21
+
+- Added django-subscriptions: plan/lifecycle management, webhook-verified state changes, soft cancellation with history, and dunning, generalised from a real sample PayPal subscription implementation's mistakes (client-trusted activation, unconditional deletion on cancel, immediate cancellation on first payment failure), verified live against that sample app. Also covers Apple App Store Server Notifications and Google Play real-time developer notifications for in-app subscriptions.
+
 ## [0.5.1] - 2026-10-21
 
 - Added transaction correctness guidance to django-services-selectors: the poisoned-transaction trap, savepoint nesting, on_commit with savepoints, model state after rollback, ATOMIC_REQUESTS scope, and never holding a transaction open across an external call.
