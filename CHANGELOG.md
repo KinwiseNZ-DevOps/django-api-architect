@@ -4,6 +4,10 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-20
+
+- Added django-open-banking: BlinkPay payment initiation (PayNow, AutoPay) and account data access (Blink Data), behind a provider-agnostic interface.
+
 ## [0.4.0] - unreleased
 
 - Initial skills.

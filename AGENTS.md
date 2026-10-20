@@ -43,6 +43,7 @@ Checks: frontmatter, name/folder match, description length and trigger, body und
 - `skills/<name>/SKILL.md`: the only source of skill content. Folder name equals frontmatter `name`.
 - `.github/agents/*.agent.md`: optional GitHub Copilot agents that run workflows using these skills.
 - `.claude/agents/*.md`: Claude Code project agents for the same workflows.
+- `plugin.json`: the portable Agent Plugins manifest used by ChatGPT and Codex. `.agents/plugins/marketplace.json` exposes this repo as a local ChatGPT desktop marketplace.
 - `.claude-plugin/plugin.json` and `marketplace.json`: the Claude Code plugin manifest and single-plugin marketplace. The `agents` array lists each Claude Code profile under `resources/agents/claude-code/`. Reason: without the key, Claude Code scans a top-level `agents/` folder and would load Codex briefs as subagents.
 - `resources/agents/codex/*.md`: Codex role briefs (installed into a target project's `agents/codex/`, never into this repo). The router skill selects a brief by task type; Codex uses native subagent delegation when the runtime provides it, and otherwise follows the brief directly. These are prompt templates, not automatically discovered Codex profiles.
 - New skills follow the house format that existing skills embody: folder name equals frontmatter `name`; frontmatter, gate, steps, hard rules.

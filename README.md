@@ -21,7 +21,7 @@
 
 [![Validate skills](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml/badge.svg)](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Agent skills](https://img.shields.io/badge/agent_skills-9-8A2BE2)](https://agentskills.io)
+[![Agent skills](https://img.shields.io/badge/agent_skills-10-8A2BE2)](https://agentskills.io)
 [![Format](https://img.shields.io/badge/format-SKILL.md-orange)](https://agentskills.io/specification)
 [![Tooling](https://img.shields.io/badge/tooling-stdlib_only-success)](scripts/skills_tool.py)
 
@@ -63,6 +63,7 @@ Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a proj
 | [`django-celery`](skills/django-celery/SKILL.md) | Governs Celery task structure, retries, transaction-safe task triggering, webhook dispatch chains, periodic tasks and Celery configuration. |
 | [`django-docker-compose`](skills/django-docker-compose/SKILL.md) | Governs the local Docker Compose stack for Django API projects: web, Postgres, Redis, Celery worker and beat services, health-gated startup, one-off migration, env files and secrets, volumes, ports, hot reload and running tests and management commands in containers. |
 | [`django-docker-images`](skills/django-docker-images/SKILL.md) | Governs Dockerfiles and container images for Django API projects: multi-stage builds with dev and runtime targets, a non-root user, dependency and cache layering, .dockerignore, secrets kept out of layers, Gunicorn instead of runserver, health checks and deploy checks. |
+| [`django-open-banking`](skills/django-open-banking/SKILL.md) | Governs open banking integrations in Django API projects: initiating account-to-account payments and reading bank account data (balances, transactions) through a provider such as BlinkPay, behind a provider-agnostic interface so a second country or provider can be added without rewriting callers. |
 | [`django-project-structure`](skills/django-project-structure/SKILL.md) | Governs Django app layout, the app pack shape, app manifests, and settings organisation for service layer API projects. |
 | [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
 | [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
@@ -84,6 +85,7 @@ flowchart TD
     R --> K["📨 django-celery<br/>tasks, retries, webhooks"]
     R --> D1["🐳 django-docker-images<br/>Dockerfile, non-root, production server"]
     R --> D2["🧱 django-docker-compose<br/>local stack, health-gated startup, env files"]
+    R --> OB["🏦 django-open-banking<br/>BlinkPay payments and account data, provider-agnostic"]
 ```
 
 Route first with django-api-architect, then work in dependency order: structure, services and selectors, APIs, auth and tasks, tests throughout.
@@ -109,6 +111,10 @@ For projects that also need a modern Django admin interface, [Unfold](https://un
 /plugin marketplace add KinwiseNZ-DevOps/django-api-architect
 /plugin install django-api-architect@django-api-architect-marketplace
 ```
+
+**ChatGPT desktop plugin** (local, skills and bundled hooks):
+
+This repo has a portable `plugin.json` manifest and a marketplace at `.agents/plugins/marketplace.json`. Open this repo as a trusted project and restart ChatGPT desktop, then install **Django API Architect** from the Plugins Directory. Review and trust bundled hook scripts before they run.
 
 Or copy or symlink the `skills/` subfolders you want into your agent's skills directory:
 

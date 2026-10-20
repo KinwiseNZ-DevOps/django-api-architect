@@ -1,0 +1,20 @@
+{
+  "name": "django-api-architect-marketplace",
+  "interface": {
+    "displayName": "KinWise Django API Architect"
+  },
+  "plugins": [
+    {
+      "name": "django-api-architect",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

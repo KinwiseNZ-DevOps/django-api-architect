@@ -7,10 +7,9 @@
   python scripts/bump_version.py 2.3.4          # set an exact version
   python scripts/bump_version.py patch --dry-run
 
-Claude Code keeps an installed plugin on its current version until `version` in
-.claude-plugin/plugin.json changes, so every release that users should receive
-needs a bump. This script edits plugin.json, the marketplace entry when it carries
-a version, and moves the "Unreleased" changelog notes under the new version.
+Claude Code and ChatGPT use their respective plugin manifests to identify a
+release. This script updates both manifests, the Claude marketplace entry when
+it carries a version, and the "Unreleased" changelog notes.
 """
 
 import datetime
@@ -20,6 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / ".claude-plugin" / "plugin.json"
+PORTABLE_PLUGIN = ROOT / "plugin.json"
 MARKETPLACE = ROOT / ".claude-plugin" / "marketplace.json"
 CHANGELOG = ROOT / "CHANGELOG.md"
 VERSION_RE = re.compile(r'("version"\s*:\s*")(\d+\.\d+\.\d+)(")')
@@ -57,6 +57,12 @@ def main():
             lambda m: f"{m.group(1)}{new}{m.group(3)}", text, count=1
         )
     }
+    if PORTABLE_PLUGIN.exists():
+        portable = PORTABLE_PLUGIN.read_text(encoding="utf-8")
+        if VERSION_RE.search(portable):
+            edits[PORTABLE_PLUGIN] = VERSION_RE.sub(
+                lambda m: f"{m.group(1)}{new}{m.group(3)}", portable, count=1
+            )
     if MARKETPLACE.exists():
         market = MARKETPLACE.read_text(encoding="utf-8")
         if VERSION_RE.search(market):
