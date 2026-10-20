@@ -1,6 +1,6 @@
 {
   "name": "django-api-architect",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Django REST Framework skills for a service layer architecture, with a workflow agent",
   "author": { "name": "KinWise Limited" },
   "license": "MIT",
