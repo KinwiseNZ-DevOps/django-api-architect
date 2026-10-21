@@ -4,6 +4,8 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+- Added `django-aws-deployment`: choosing between ECS on Fargate, App Runner and Elastic Beanstalk, shared production settings, health checks behind a load balancer, secrets, migrations and logging, from AWS documentation and the App Runner blog post.
+
 ## [0.6.0] - 2026-10-21
 
 - Added django-subscriptions: plan/lifecycle management, webhook-verified state changes, soft cancellation with history, and dunning, generalised from a real sample PayPal subscription implementation's mistakes (client-trusted activation, unconditional deletion on cancel, immediate cancellation on first payment failure), verified live against that sample app. Also covers Apple App Store Server Notifications and Google Play real-time developer notifications for in-app subscriptions.

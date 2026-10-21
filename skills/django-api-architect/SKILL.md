@@ -7,7 +7,7 @@ description: >
   small ones such as a new endpoint, a serializer tweak, a view optimisation, an
   export, or a request to switch these rules off, and when it is unclear which
   specialist skill applies. Do not use for Flutter or frontend work, deployment
-  platforms, or non-Django backends.
+  platforms other than AWS, or non-Django backends.
 ---
 
 # Django API Architect (router)
@@ -29,6 +29,7 @@ Route by the layer the task actually touches. When in doubt, ask which file the 
 | Celery tasks, retries, periodic tasks, webhook dispatch | [django-celery](../django-celery/SKILL.md) |
 | Dockerfile, image build, container start command, health check | [django-docker-images](../django-docker-images/SKILL.md) |
 | Local docker compose stack: web, database, broker, workers, env files, container test commands | [django-docker-compose](../django-docker-compose/SKILL.md) |
+| Deploying to AWS: Fargate, App Runner or Elastic Beanstalk, production settings, health checks, migrations on release | [django-aws-deployment](../django-aws-deployment/SKILL.md) |
 | Open banking payment initiation or bank account data access (BlinkPay or another provider) | [django-open-banking](../django-open-banking/SKILL.md) |
 | Subscription plans, activation, cancellation, upgrades/downgrades, billing webhooks | [django-subscriptions](../django-subscriptions/SKILL.md) |
 

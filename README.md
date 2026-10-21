@@ -21,7 +21,7 @@
 
 [![Validate skills](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml/badge.svg)](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Agent skills](https://img.shields.io/badge/agent_skills-11-8A2BE2)](https://agentskills.io)
+[![Agent skills](https://img.shields.io/badge/agent_skills-12-8A2BE2)](https://agentskills.io)
 [![Format](https://img.shields.io/badge/format-SKILL.md-orange)](https://agentskills.io/specification)
 [![Tooling](https://img.shields.io/badge/tooling-stdlib_only-success)](scripts/skills_tool.py)
 
@@ -60,6 +60,7 @@ Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a proj
 | [`django-api-architect`](skills/django-api-architect/SKILL.md) | Router and shared guardrails for Django REST Framework API projects built on a service layer architecture with thin APIs, services, selectors and app packs. |
 | [`django-apis-serializers`](skills/django-apis-serializers/SKILL.md) | Governs DRF API classes, input and output serializers, filtering, pagination, and the JSON error contract. |
 | [`django-auth`](skills/django-auth/SKILL.md) | Governs authentication in Django API projects: JWT login, refresh and logout, passwordless OTP codes, admin second factor, and login throttling. |
+| [`django-aws-deployment`](skills/django-aws-deployment/SKILL.md) | Governs deploying a Django API to AWS: choosing between ECS on Fargate, App Runner and Elastic Beanstalk, the Django settings every platform needs (ALLOWED_HOSTS, secrets, static files, database, proxy headers), health checks behind a load balancer, where migrations run, and logging. |
 | [`django-celery`](skills/django-celery/SKILL.md) | Governs Celery task structure, retries, transaction-safe task triggering, webhook dispatch chains, periodic tasks and Celery configuration. |
 | [`django-docker-compose`](skills/django-docker-compose/SKILL.md) | Governs the local Docker Compose stack for Django API projects: web, Postgres, Redis, Celery worker and beat services, health-gated startup, one-off migration, env files and secrets, volumes, ports, hot reload and running tests and management commands in containers. |
 | [`django-docker-images`](skills/django-docker-images/SKILL.md) | Governs Dockerfiles and container images for Django API projects: multi-stage builds with dev and runtime targets, a non-root user, dependency and cache layering, .dockerignore, secrets kept out of layers, Gunicorn instead of runserver, health checks and deploy checks. |
@@ -85,6 +86,7 @@ flowchart TD
     R --> A2["🔑 django-auth<br/>JWT, OTP, admin second factor"]
     R --> K["📨 django-celery<br/>tasks, retries, webhooks"]
     R --> D1["🐳 django-docker-images<br/>Dockerfile, non-root, production server"]
+    R --> D3["☁️ django-aws-deployment<br/>Fargate, App Runner, Elastic Beanstalk"]
     R --> D2["🧱 django-docker-compose<br/>local stack, health-gated startup, env files"]
     R --> OB["🏦 django-open-banking<br/>BlinkPay payments and account data, provider-agnostic"]
     R --> SUB["🔁 django-subscriptions<br/>plans, lifecycle, webhook-driven state, dunning"]
@@ -188,6 +190,7 @@ Privacy: `packageGuard` and `licenseGuard` send package names, and `linkGuard` s
 | `login / OTP / token` | JWT and OTP flows, throttling, admin second factor | *django-auth* |
 | `background task / webhook` | Celery task, retries, on_commit triggering | *django-celery* |
 | `dockerise this` | Multi-stage Dockerfile, non-root user, Gunicorn runtime | *django-docker-images* |
+| `deploy this to AWS` | Platform choice, production settings, health checks | *django-aws-deployment* |
 | `set up local docker` | Compose stack with healthy database, broker, worker and beat | *django-docker-compose* |
 | `test this` | pytest layout, mock boundaries, failure paths | *django-testing* |
 
