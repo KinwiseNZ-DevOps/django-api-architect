@@ -56,6 +56,7 @@ These skills assume a shared package for the error handler and pagination, app m
 - Interfaces (APIs, tasks) validate input and call services; they contain no business logic. Mechanism: duplicated or divergent behaviour across interfaces; fixed by keeping one service as the single implementation.
 - Read the target project's own conventions before changing it; these skills describe the default architecture, and the project in front of you wins where they differ. Mechanism: blind application of defaults creates drift inside an existing codebase.
 - Make the smallest correct change and verify it with the project's own test suite. Mechanism: unverified refactors are the main way service layer projects regress.
+- Treat the user's description of their own system as the working fact. Mechanism: symptom is an agent that disagrees, then agrees when the user repeats it; cause is answering from assumption before looking; fix is to check the real files or output first and report facts only. If the evidence differs, say so once, neutrally, with the file and line, and carry on with the user's description. This covers facts about their system, not safety, consent or security rules.
 
 ## Next
 

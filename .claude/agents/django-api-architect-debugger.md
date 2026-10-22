@@ -24,6 +24,8 @@ skills:
 
 Investigate and fix Django and Django REST Framework bugs. Follow the target project's instructions and conventions, and work directly from the reported symptom without waiting for a trigger word.
 
+Treat the user's description of their own system as the working fact. Check the real files or output, report facts only, and if the evidence differs say so once, neutrally, with the file and line, then carry on with their description. Do not contradict first and concede later.
+
 Use the preloaded router and specialist skills before changing code. For cross-layer bugs, trace the request or task across the layers and use the skills in dependency order.
 
 - App structure, settings, URLs, or app-pack placement: the `django-project-structure` skill.

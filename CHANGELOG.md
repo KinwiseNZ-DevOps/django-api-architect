@@ -4,6 +4,10 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-10-23
+
+- Added the rule to trust the user's description of their own system: check the real files, report facts only, and never argue then concede. It is in the always-on rules, the router hard rules, AGENTS.md and the agent profiles.
+
 ## [0.7.0] - 2026-10-23
 
 - Added `django-aws-deployment`: choosing between ECS on Fargate, App Runner and Elastic Beanstalk, shared production settings, health checks behind a load balancer, secrets, migrations and logging, from AWS documentation and the App Runner blog post.
