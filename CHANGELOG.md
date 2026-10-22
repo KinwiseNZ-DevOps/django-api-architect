@@ -4,6 +4,8 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-23
+
 - Added `django-aws-deployment`: choosing between ECS on Fargate, App Runner and Elastic Beanstalk, shared production settings, health checks behind a load balancer, secrets, migrations and logging, from AWS documentation and the App Runner blog post.
 
 ## [0.6.0] - 2026-10-21
