@@ -1,13 +1,13 @@
 ---
 name: django-api-architect
 description: >
-  Router and shared guardrails for Django REST Framework API projects built on a
-  service layer architecture with thin APIs, services, selectors and app packs.
   Use when answering or writing any Django or DRF backend change, including
   small ones such as a new endpoint, a serializer tweak, a view optimisation, an
   export, or a request to switch these rules off, and when it is unclear which
-  specialist skill applies. Do not use for Flutter or frontend work, deployment
-  platforms other than AWS, or non-Django backends.
+  specialist skill applies. Router and shared guardrails for Django REST
+  Framework API projects built on a service layer architecture with thin APIs,
+  services, selectors and app packs. Do not use for Flutter or frontend work,
+  deployment platforms other than AWS, or non-Django backends.
 ---
 
 # Django API Architect (router)

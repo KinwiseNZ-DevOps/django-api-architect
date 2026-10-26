@@ -1,16 +1,12 @@
 ---
 name: django-open-banking
 description: >
-  Governs open banking integrations in Django API projects: initiating
-  account-to-account payments and reading bank account data (balances,
-  transactions) through a provider such as BlinkPay, behind a
-  provider-agnostic interface so a second country or provider can be
-  added without rewriting callers. Use when building or changing a
-  payment consent, a bank data consent, a payment or consent status
-  check, a refund, or an open banking provider adapter. Do not use for
-  card-only payment gateways with no bank consent step, for the service
-  and selector conventions themselves (django-services-selectors), or
-  for task retry mechanics in general (django-celery).
+  Use when building or changing a payment consent, a bank data consent, a
+  payment or consent status check, a refund, or an open banking provider
+  adapter. Governs open banking integrations in Django API projects. Do not use
+  for card-only payment gateways with no bank consent step, for the service and
+  selector conventions themselves (django-services-selectors), or for task retry
+  mechanics in general (django-celery).
 ---
 
 # Django Open Banking

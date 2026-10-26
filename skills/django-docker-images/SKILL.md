@@ -1,14 +1,12 @@
 ---
 name: django-docker-images
 description: >
-  Governs Dockerfiles and container images for Django API projects: multi-stage
-  builds with dev and runtime targets, a non-root user, dependency and cache
-  layering, .dockerignore, secrets kept out of layers, Gunicorn instead of
-  runserver, health checks and deploy checks. Use when writing or changing a
-  Dockerfile, an image build, ARG or ENV values, a container CMD, or a
-  HEALTHCHECK, including when asked to use runserver or to pass secrets as build
-  arguments. Do not use for the local multi-service stack (django-docker-compose), settings layout (django-project-structure) or Celery task code
-  (django-celery).
+  Use when writing or changing a Dockerfile, an image build, ARG or ENV values,
+  a container CMD, or a HEALTHCHECK, including when asked to use runserver or to
+  pass secrets as build arguments. Governs Dockerfiles and container images for
+  Django API projects. Do not use for the local multi-service stack (django-
+  docker-compose), settings layout (django-project-structure) or Celery task
+  code (django-celery).
 ---
 
 # Django Docker Images

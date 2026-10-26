@@ -60,14 +60,14 @@ Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a proj
 | [`django-api-architect`](skills/django-api-architect/SKILL.md) | Router and shared guardrails for Django REST Framework API projects built on a service layer architecture with thin APIs, services, selectors and app packs. |
 | [`django-apis-serializers`](skills/django-apis-serializers/SKILL.md) | Governs DRF API classes, input and output serializers, filtering, pagination, and the JSON error contract. |
 | [`django-auth`](skills/django-auth/SKILL.md) | Governs authentication in Django API projects: JWT login, refresh and logout, passwordless OTP codes, admin second factor, and login throttling. |
-| [`django-aws-deployment`](skills/django-aws-deployment/SKILL.md) | Governs deploying a Django API to AWS: choosing between ECS on Fargate, App Runner and Elastic Beanstalk, the Django settings every platform needs (ALLOWED_HOSTS, secrets, static files, database, proxy headers), health checks behind a load balancer, where migrations run, and logging. |
+| [`django-aws-deployment`](skills/django-aws-deployment/SKILL.md) | Governs deploying a Django API to AWS. |
 | [`django-celery`](skills/django-celery/SKILL.md) | Governs Celery task structure, retries, transaction-safe task triggering, webhook dispatch chains, periodic tasks and Celery configuration. |
-| [`django-docker-compose`](skills/django-docker-compose/SKILL.md) | Governs the local Docker Compose stack for Django API projects: web, Postgres, Redis, Celery worker and beat services, health-gated startup, one-off migration, env files and secrets, volumes, ports, hot reload and running tests and management commands in containers. |
-| [`django-docker-images`](skills/django-docker-images/SKILL.md) | Governs Dockerfiles and container images for Django API projects: multi-stage builds with dev and runtime targets, a non-root user, dependency and cache layering, .dockerignore, secrets kept out of layers, Gunicorn instead of runserver, health checks and deploy checks. |
-| [`django-open-banking`](skills/django-open-banking/SKILL.md) | Governs open banking integrations in Django API projects: initiating account-to-account payments and reading bank account data (balances, transactions) through a provider such as BlinkPay, behind a provider-agnostic interface so a second country or provider can be added without rewriting callers. |
+| [`django-docker-compose`](skills/django-docker-compose/SKILL.md) | Governs the local Docker Compose stack for Django API projects. |
+| [`django-docker-images`](skills/django-docker-images/SKILL.md) | Governs Dockerfiles and container images for Django API projects. |
+| [`django-open-banking`](skills/django-open-banking/SKILL.md) | Governs open banking integrations in Django API projects. |
 | [`django-project-structure`](skills/django-project-structure/SKILL.md) | Governs Django app layout, the app pack shape, app manifests, and settings organisation for service layer API projects. |
 | [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
-| [`django-subscriptions`](skills/django-subscriptions/SKILL.md) | Governs subscription lifecycle management in Django API projects: plans, activation, upgrades and downgrades, cancellation, and payment-failure handling (dunning), behind a provider-agnostic interface for the recurring billing processor (Stripe, PayPal, Apple App Store, Google Play, or similar). |
+| [`django-subscriptions`](skills/django-subscriptions/SKILL.md) | Governs subscription lifecycle management in Django API projects. |
 | [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
 <!-- catalogue:end -->
 

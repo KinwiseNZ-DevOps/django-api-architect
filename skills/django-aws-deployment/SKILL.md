@@ -1,16 +1,12 @@
 ---
 name: django-aws-deployment
 description: >
-  Governs deploying a Django API to AWS: choosing between ECS on Fargate, App
-  Runner and Elastic Beanstalk, the Django settings every platform needs
-  (ALLOWED_HOSTS, secrets, static files, database, proxy headers), health
-  checks behind a load balancer, where migrations run, and logging. Use when
-  asked to deploy, host or move a Django project on AWS, to write an App Runner
-  config, an ECS task definition or an Elastic Beanstalk config, or when a
-  deployed Django app returns 400 on health checks or cannot reach its database.
-  Do not use for the Dockerfile itself (django-docker-images), the local
-  stack (django-docker-compose), settings layout (django-project-structure) or
-  non-AWS platforms.
+  Use when asked to deploy, host or move a Django project on AWS, to write an
+  App Runner config, an ECS task definition or an Elastic Beanstalk config, or
+  when a deployed Django app returns 400 on health checks or cannot reach its
+  database. Governs deploying a Django API to AWS. Do not use for the Dockerfile
+  itself (django-docker-images), the local stack (django-docker-compose),
+  settings layout (django-project-structure) or non-AWS platforms.
 ---
 
 # Django AWS deployment

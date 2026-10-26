@@ -1,16 +1,12 @@
 ---
 name: django-subscriptions
 description: >
-  Governs subscription lifecycle management in Django API projects:
-  plans, activation, upgrades and downgrades, cancellation, and
-  payment-failure handling (dunning), behind a provider-agnostic
-  interface for the recurring billing processor (Stripe, PayPal, Apple
-  App Store, Google Play, or similar). Use when building or changing a
-  subscription plan, activation flow, cancellation, upgrade or
-  downgrade, or a billing webhook or app store server notification. Do
-  not use for the open banking payment-consent mechanics themselves
-  (django-open-banking), for a one-off payment with no recurring plan,
-  or for Celery task mechanics in general (django-celery).
+  Use when building or changing a subscription plan, activation flow,
+  cancellation, upgrade or downgrade, or a billing webhook or app store server
+  notification. Governs subscription lifecycle management in Django API
+  projects. Do not use for the open banking payment-consent mechanics themselves
+  (django-open-banking), for a one-off payment with no recurring plan, or for
+  Celery task mechanics in general (django-celery).
 ---
 
 # Django Subscriptions

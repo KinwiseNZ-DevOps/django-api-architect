@@ -1,12 +1,13 @@
 ---
 name: django-auth
 description: >
-  Governs authentication in Django API projects: JWT login, refresh and logout,
-  passwordless OTP codes, admin second factor, and login throttling. Use when
-  building or changing login, tokens, simplejwt, OTP codes and how they are
-  stored, new-IP or login alerts, or login throttling, including when asked to
-  write a custom token endpoint or to store codes in plaintext. Do not use for
-  general API permissions or throttle scopes outside auth (django-apis-serializers).
+  Use when building or changing login, tokens, simplejwt, OTP codes and how they
+  are stored, new-IP or login alerts, or login throttling, including when asked
+  to write a custom token endpoint or to store codes in plaintext. Governs
+  authentication in Django API projects: JWT login, refresh and logout,
+  passwordless OTP codes, admin second factor, and login throttling. Do not use
+  for general API permissions or throttle scopes outside auth (django-apis-
+  serializers).
 ---
 
 # Django Authentication

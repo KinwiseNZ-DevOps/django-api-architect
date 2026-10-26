@@ -1,12 +1,13 @@
 ---
 name: django-apis-serializers
 description: >
-  Governs DRF API classes, input and output serializers, filtering, pagination,
-  and the JSON error contract. Use when writing or changing an endpoint, a
-  serializer, a list filter, pagination, a 404 or validation error response, or
-  an exception handler, including when asked to expose raw exceptions or to
-  raise errors from a service. Do not use for the business logic those APIs call
-  (django-services-selectors) or for login and token endpoints (django-auth).
+  Use when writing or changing an endpoint, a serializer, a list filter,
+  pagination, a 404 or validation error response, or an exception handler,
+  including when asked to expose raw exceptions or to raise errors from a
+  service. Governs DRF API classes, input and output serializers, filtering,
+  pagination, and the JSON error contract. Do not use for the business logic
+  those APIs call (django-services-selectors) or for login and token endpoints
+  (django-auth).
 ---
 
 # Django APIs and Serializers
