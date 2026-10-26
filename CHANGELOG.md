@@ -4,6 +4,8 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-26
+
 - Added triggering tests (`evals/triggers.jsonl`): every skill has an obvious, a paraphrase and an unrelated query, checked by the validator and exported as `tool_used` graders.
 - The always-on rules now default to `auto`, so they load only in Django projects (`manage.py`, or Django in the requirements).
 - Moved Hard rules to the top of every skill, above the gate.
