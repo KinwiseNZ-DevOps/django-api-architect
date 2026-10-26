@@ -1,0 +1,36 @@
+{"skill": "django-api-architect", "type": "obvious", "query": "Add a new endpoint to our Django REST API that lists a household's accounts."}
+{"skill": "django-api-architect", "type": "paraphrase", "query": "Our backend needs a way for the app to fetch a user's saved budgets. Where should the code for that go?"}
+{"skill": "django-api-architect", "type": "unrelated", "query": "Build a Flutter screen that shows a list of budgets with pull to refresh."}
+{"skill": "django-apis-serializers", "type": "obvious", "query": "Write a DRF serializer and API class for creating a transaction, with pagination on the list."}
+{"skill": "django-apis-serializers", "type": "paraphrase", "query": "When someone sends bad data to our create call, the app gets an ugly stack trace. How should the response look?"}
+{"skill": "django-apis-serializers", "type": "unrelated", "query": "Write a Celery task that retries sending a welcome email."}
+{"skill": "django-auth", "type": "obvious", "query": "Set up JWT login with refresh and logout for our Django API."}
+{"skill": "django-auth", "type": "paraphrase", "query": "Users should sign in with a six digit code sent by email instead of a password. How do we build and store those codes safely?"}
+{"skill": "django-auth", "type": "unrelated", "query": "Add a throttle so anonymous users can only hit the public rates endpoint 100 times an hour."}
+{"skill": "django-aws-deployment", "type": "obvious", "query": "Deploy our Django API to AWS App Runner."}
+{"skill": "django-aws-deployment", "type": "paraphrase", "query": "Our Django container runs in the cloud but the load balancer keeps marking it unhealthy with 400 errors. What is wrong?"}
+{"skill": "django-aws-deployment", "type": "unrelated", "query": "Write a Dockerfile for our Django API with a non-root user."}
+{"skill": "django-celery", "type": "obvious", "query": "Write a Celery task that sends a notification email after a transaction is saved, with retries."}
+{"skill": "django-celery", "type": "paraphrase", "query": "My background job sometimes runs before the database row it needs exists. How do I stop that?"}
+{"skill": "django-celery", "type": "unrelated", "query": "Write pytest tests for our refund service."}
+{"skill": "django-docker-compose", "type": "obvious", "query": "Write a docker-compose file for local development with web, Postgres, Redis and a Celery worker."}
+{"skill": "django-docker-compose", "type": "paraphrase", "query": "When I start everything locally the web container crashes because the database is not ready yet. How do I fix that?"}
+{"skill": "django-docker-compose", "type": "unrelated", "query": "Which AWS service should I use to host the production API?"}
+{"skill": "django-docker-images", "type": "obvious", "query": "Write a multi-stage Dockerfile for our Django API that runs Gunicorn."}
+{"skill": "django-docker-images", "type": "paraphrase", "query": "Our built container image is huge and runs as root. How do we tidy it up?"}
+{"skill": "django-docker-images", "type": "unrelated", "query": "Add a Postgres service with a health check to the local compose stack."}
+{"skill": "django-open-banking", "type": "obvious", "query": "Add a BlinkPay payment consent flow to our Django API."}
+{"skill": "django-open-banking", "type": "paraphrase", "query": "Let users pay straight from their bank account and check later whether it went through, and keep it easy to add another country's bank later."}
+{"skill": "django-open-banking", "type": "unrelated", "query": "Charge a customer's credit card with Stripe checkout for a one-off purchase."}
+{"skill": "django-project-structure", "type": "obvious", "query": "Create a new Django app for budgets and wire up its URLs."}
+{"skill": "django-project-structure", "type": "paraphrase", "query": "Where should I put the API keys and environment-specific config for our Django project?"}
+{"skill": "django-project-structure", "type": "unrelated", "query": "Write the pytest fixtures for our budget service tests."}
+{"skill": "django-services-selectors", "type": "obvious", "query": "Write a service that processes a refund and a selector that lists a user's transactions."}
+{"skill": "django-services-selectors", "type": "paraphrase", "query": "Where should the rule that a household cannot overspend its budget live, and how do I make a multi-step update all-or-nothing?"}
+{"skill": "django-services-selectors", "type": "unrelated", "query": "Set up JWT token refresh and logout endpoints."}
+{"skill": "django-subscriptions", "type": "obvious", "query": "Implement subscription plans with upgrade, downgrade and cancellation for our Django API."}
+{"skill": "django-subscriptions", "type": "paraphrase", "query": "A customer's monthly card payment failed. We need to retry it and eventually stop their access. How should that work?"}
+{"skill": "django-subscriptions", "type": "unrelated", "query": "Create a BlinkPay bank consent so a user can share their account balances."}
+{"skill": "django-testing", "type": "obvious", "query": "Write pytest tests for our transaction service and API."}
+{"skill": "django-testing", "type": "paraphrase", "query": "How do I check my Django code works without calling the real payment provider?"}
+{"skill": "django-testing", "type": "unrelated", "query": "Write a service that creates a transaction."}

@@ -15,6 +15,21 @@ description: >
 
 Stance: the image is a reproducible build artefact. Frozen: a non-root runtime user, no secrets in layers, exec-form commands, and a production server (never `runserver`) in the runtime stage. Flexible: base image choice, requirements layout and tooling (pip, uv, poetry), which follow the project.
 
+## Hard rules
+
+- Never run `runserver` in the runtime stage. Mechanism: Django states it has had no security audit or performance testing and is unsuitable for production; the runtime stage uses a production WSGI or ASGI server such as Gunicorn.
+- Run as a non-root user with an explicit UID and GID. Mechanism: automatically assigned IDs can change across rebuilds, and a process running as root turns any container escape or file-write bug into a bigger one.
+- Never put a secret in `ENV`, `ARG` or a copied file. Mechanism: those values persist in image layers and anyone with the image can read them. Pass runtime secrets as environment variables or mounted files at run time, and build-time secrets with a build secret mount.
+- Use exec-form `CMD` and `ENTRYPOINT` (a JSON array), and `exec` in any wrapper script. Mechanism: shell form runs under `/bin/sh -c`, so the server is not PID 1 and does not receive `SIGTERM` from `docker stop`, which means slow, forced kills and dropped requests.
+- Keep `apt-get update` and `apt-get install` in one `RUN`, with `--no-install-recommends` and cleanup of `/var/lib/apt/lists` in the same layer. Mechanism: a cached `update` layer can go stale and make installs fail, and cleanup in a later layer does not shrink the image.
+- Copy dependency files and install before copying source. Mechanism: a source edit then reuses the cached dependency layer instead of reinstalling everything.
+- Pin the base image to at least a minor version tag, and rebuild regularly. Mechanism: tags are mutable and an image is a snapshot of its base at build time, so unpinned builds drift and old builds miss security fixes. Digest pinning gives full reproducibility but needs automated updates.
+- Set `PYTHONUNBUFFERED=1` and `PYTHONDONTWRITEBYTECODE=1` in the image. Mechanism: unbuffered output reaches `docker logs` immediately, and skipping `.pyc` files keeps the writable layer clean.
+- Do not run `migrate` in the runtime `CMD`. Mechanism: with more than one replica, several containers race to migrate on start; run migrations as a separate one-off step (inference).
+- If `collectstatic` runs at build time, pass its required settings inline for that one `RUN`, not as persistent `ENV`. Mechanism: required secrets have no default, so the command needs values, and persistent `ENV` would bake them into the image.
+- Allow the health check's host in `ALLOWED_HOSTS`. Mechanism: with `DEBUG` off Django rejects unknown Host headers, so a check calling `127.0.0.1` fails as unhealthy unless that host is allowed.
+- Set Gunicorn `--workers` deliberately. Mechanism: the Gunicorn docs suggest starting at (2 x CPU cores) + 1 and adjusting under load; sync workers need a buffering proxy such as nginx in front.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -37,21 +52,6 @@ Reason: an image that works on one machine but bakes in local state or secrets i
 2. **Write.** Use stages: a shared `base`, a dependency stage that builds the virtual environment, a `dev` target, and a final `runtime` target. The last stage is the default build target, so make it the production-shaped one. The full example with comments is in [dockerfile-example.md](references/dockerfile-example.md). Order instructions from least to most frequently changing: system packages, dependency files, installed dependencies, then source code.
 3. **Ignore.** Write a `.dockerignore` that excludes `.git`, `.env` and other env files, virtual environments, `__pycache__`, media, test caches and local databases. See the example in the reference.
 4. **Verify.** Build both targets. Run the runtime image as its non-root user. Run `python manage.py check --deploy` against the production settings inside the image. Confirm `docker history` shows no secret values. Start the container and confirm the health check reaches healthy.
-
-## Hard rules
-
-- Never run `runserver` in the runtime stage. Mechanism: Django states it has had no security audit or performance testing and is unsuitable for production; the runtime stage uses a production WSGI or ASGI server such as Gunicorn.
-- Run as a non-root user with an explicit UID and GID. Mechanism: automatically assigned IDs can change across rebuilds, and a process running as root turns any container escape or file-write bug into a bigger one.
-- Never put a secret in `ENV`, `ARG` or a copied file. Mechanism: those values persist in image layers and anyone with the image can read them. Pass runtime secrets as environment variables or mounted files at run time, and build-time secrets with a build secret mount.
-- Use exec-form `CMD` and `ENTRYPOINT` (a JSON array), and `exec` in any wrapper script. Mechanism: shell form runs under `/bin/sh -c`, so the server is not PID 1 and does not receive `SIGTERM` from `docker stop`, which means slow, forced kills and dropped requests.
-- Keep `apt-get update` and `apt-get install` in one `RUN`, with `--no-install-recommends` and cleanup of `/var/lib/apt/lists` in the same layer. Mechanism: a cached `update` layer can go stale and make installs fail, and cleanup in a later layer does not shrink the image.
-- Copy dependency files and install before copying source. Mechanism: a source edit then reuses the cached dependency layer instead of reinstalling everything.
-- Pin the base image to at least a minor version tag, and rebuild regularly. Mechanism: tags are mutable and an image is a snapshot of its base at build time, so unpinned builds drift and old builds miss security fixes. Digest pinning gives full reproducibility but needs automated updates.
-- Set `PYTHONUNBUFFERED=1` and `PYTHONDONTWRITEBYTECODE=1` in the image. Mechanism: unbuffered output reaches `docker logs` immediately, and skipping `.pyc` files keeps the writable layer clean.
-- Do not run `migrate` in the runtime `CMD`. Mechanism: with more than one replica, several containers race to migrate on start; run migrations as a separate one-off step (inference).
-- If `collectstatic` runs at build time, pass its required settings inline for that one `RUN`, not as persistent `ENV`. Mechanism: required secrets have no default, so the command needs values, and persistent `ENV` would bake them into the image.
-- Allow the health check's host in `ALLOWED_HOSTS`. Mechanism: with `DEBUG` off Django rejects unknown Host headers, so a check calling `127.0.0.1` fails as unhealthy unless that host is allowed.
-- Set Gunicorn `--workers` deliberately. Mechanism: the Gunicorn docs suggest starting at (2 x CPU cores) + 1 and adjusting under load; sync workers need a buffering proxy such as nginx in front.
 
 ## References
 

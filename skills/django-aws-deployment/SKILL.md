@@ -17,6 +17,16 @@ description: >
 
 Stance: the app is built once and configured by environment. Frozen: no secrets in code or images, a production server, a managed database outside the app container, migrations run once per release, and a health check that passes. Flexible: which AWS service hosts it, which follows the project's size, team skills and budget.
 
+## Hard rules
+
+- Never hard-code a secret, or put one in an image, an `apprunner.yaml`, a task definition or a repo. Mechanism: those files are readable by anyone with repo or image access. Reference a Secrets Manager or Parameter Store entry and give the runtime role read access to that one entry.
+- Never use SQLite in production on these platforms. Mechanism: containers and instances are replaced, so local files disappear and several instances would hold different copies.
+- Never leave `DEBUG` on or `ALLOWED_HOSTS = ["*"]` in production. Mechanism: debug pages leak settings, and a wildcard removes the Host header protection.
+- Run `migrate` once per release, not on every start with more than one instance. Mechanism: several instances race to change the same tables. Elastic Beanstalk offers a leader-only command for this; on ECS use a one-off task (inference for ECS, supported by the Elastic Beanstalk documentation for its own platform).
+- A secret read from the environment is fixed when the task starts. Mechanism: after a secret changes, force a new deployment or start a new task (stated in the ECS documentation for Secrets Manager values).
+- Do not copy version pins from tutorials. Mechanism: the source articles pin old Python and Django versions; use the project's own pins and the platform's currently supported runtime.
+- Never run AWS commands that create or delete resources without a person's yes. Mechanism: they cost money and can destroy data.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -62,16 +72,6 @@ Reason: AWS actions cost money and change live systems, and a secret committed t
 
 Input: "Our Fargate service keeps replacing tasks; the target group says unhealthy."
 Output: the load balancer calls the task by its private IP, so Django rejects the Host header with a 400 and the health check fails. Fix by serving the health path without the host check (a small middleware) or allowing the task's host, point the target group at that path, and confirm in the target health reason code (for example `Target.ResponseCodeMismatch`) before and after.
-
-## Hard rules
-
-- Never hard-code a secret, or put one in an image, an `apprunner.yaml`, a task definition or a repo. Mechanism: those files are readable by anyone with repo or image access. Reference a Secrets Manager or Parameter Store entry and give the runtime role read access to that one entry.
-- Never use SQLite in production on these platforms. Mechanism: containers and instances are replaced, so local files disappear and several instances would hold different copies.
-- Never leave `DEBUG` on or `ALLOWED_HOSTS = ["*"]` in production. Mechanism: debug pages leak settings, and a wildcard removes the Host header protection.
-- Run `migrate` once per release, not on every start with more than one instance. Mechanism: several instances race to change the same tables. Elastic Beanstalk offers a leader-only command for this; on ECS use a one-off task (inference for ECS, supported by the Elastic Beanstalk documentation for its own platform).
-- A secret read from the environment is fixed when the task starts. Mechanism: after a secret changes, force a new deployment or start a new task (stated in the ECS documentation for Secrets Manager values).
-- Do not copy version pins from tutorials. Mechanism: the source articles pin old Python and Django versions; use the project's own pins and the platform's currently supported runtime.
-- Never run AWS commands that create or delete resources without a person's yes. Mechanism: they cost money and can destroy data.
 
 ## References
 

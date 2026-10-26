@@ -13,6 +13,13 @@ description: >
 
 Stance: tasks are interfaces, not logic. A task fetches its inputs, calls a service, and handles retry and failure. Everything else is flexible.
 
+## Hard rules
+
+- Tasks call services; they contain no business logic. Mechanism: symptom is the same rule implemented differently in a task and an API; cause is logic written where it is triggered; fix is one service called by every interface.
+- Always trigger tasks via `transaction.on_commit` inside transactions. Mechanism: symptom is intermittent "object does not exist" errors in workers; cause is the task running before the transaction commits; fix is the on_commit hook.
+- Import services inside the task body and tasks at module level (aliased `_task` on name collision). Mechanism: the reverse ordering creates circular imports between tasks and services.
+- Bounded retries only; unbounded retry loops mask permanent failures. Mechanism: a poison message otherwise retries forever, consuming workers.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -33,13 +40,6 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - Inside `@transaction.atomic` services, trigger with `transaction.on_commit(lambda: task.delay(...))`, never directly. `on_commit` callbacks take no arguments (bind with a lambda or `functools.partial`), run immediately if there is no open transaction, and are discarded if the transaction rolls back. With the default `robust=False`, an exception in one callback skips the later ones registered in the same transaction.
    - Webhook providers: one endpoint that verifies the signature (400 on failure), logs the event idempotently in an event table inside a transaction, dispatches a dispatcher task, and acknowledges 200 within the provider's timeout. The dispatcher maps event types to handlers, skips already-processed events, marks `processed_at` after success, and retries on handler failure. Handlers call idempotent service upserts.
 3. **Verify.** Task tests confirm delegation, retry-on-failure and exhaustion behaviour (see django-testing); no task duplicates logic that exists in a service.
-
-## Hard rules
-
-- Tasks call services; they contain no business logic. Mechanism: symptom is the same rule implemented differently in a task and an API; cause is logic written where it is triggered; fix is one service called by every interface.
-- Always trigger tasks via `transaction.on_commit` inside transactions. Mechanism: symptom is intermittent "object does not exist" errors in workers; cause is the task running before the transaction commits; fix is the on_commit hook.
-- Import services inside the task body and tasks at module level (aliased `_task` on name collision). Mechanism: the reverse ordering creates circular imports between tasks and services.
-- Bounded retries only; unbounded retry loops mask permanent failures. Mechanism: a poison message otherwise retries forever, consuming workers.
 
 ## Configuration
 

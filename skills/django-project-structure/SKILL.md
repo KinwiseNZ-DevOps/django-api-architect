@@ -13,6 +13,14 @@ description: >
 
 Stance: the pack shape and the core-versus-optional split are frozen; file contents belong to the sibling skills. A new domain starts as a pack, never as logic inside the core.
 
+## Hard rules
+
+- Every app follows the same file shape: models, selectors, services, apis, tasks, urls, tests. Mechanism: fixed names are the interface; any reader or agent knows where to look without reading the app.
+- Core apps stay generic; domain behaviour lives in packs. Mechanism: symptom is core apps growing domain-specific branches; cause is in-place shortcuts; fix is a new pack plus manifest.
+- Settings live in one file per environment plus one partial per concern, composed in `base.py`; environment differences are environment variables, not divergent code. Mechanism: duplicated settings drift between environments; builder functions and partials keep single sources.
+- Required secrets have no default (fail fast at import); optional values carry safe defaults. Never commit `.env`; ship `.env.example` instead.
+- Never edit a migration that has already been applied in another environment. Mechanism: symptom is a schema that no longer matches any migration and cannot be replayed; cause is editing history that other environments have already recorded; fix is a new corrective migration, never a rewrite of an old one.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -34,14 +42,6 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - URL mounting is dynamic: the root URL config mounts a pack's `urlconf` under its `url_prefix` only when the app is installed, so disabling a pack removes its routes with it.
    - Migrations travel with the change that caused them. Generate the app's initial migration with `makemigrations`, read the generated file, and commit it with the app. A model without its migration is not installable.
 3. **Verify.** The app imports, its manifest loads, `INSTALLED_APPS` contains it if and only if it is enabled, its routes appear under the declared prefix, and `migrate` runs clean against the committed migrations.
-
-## Hard rules
-
-- Every app follows the same file shape: models, selectors, services, apis, tasks, urls, tests. Mechanism: fixed names are the interface; any reader or agent knows where to look without reading the app.
-- Core apps stay generic; domain behaviour lives in packs. Mechanism: symptom is core apps growing domain-specific branches; cause is in-place shortcuts; fix is a new pack plus manifest.
-- Settings live in one file per environment plus one partial per concern, composed in `base.py`; environment differences are environment variables, not divergent code. Mechanism: duplicated settings drift between environments; builder functions and partials keep single sources.
-- Required secrets have no default (fail fast at import); optional values carry safe defaults. Never commit `.env`; ship `.env.example` instead.
-- Never edit a migration that has already been applied in another environment. Mechanism: symptom is a schema that no longer matches any migration and cannot be replayed; cause is editing history that other environments have already recorded; fix is a new corrective migration, never a rewrite of an old one.
 
 ## References
 

@@ -13,6 +13,12 @@ description: >
 
 Stance: the pytest layout and the mock boundaries are frozen; what counts as enough coverage per layer follows the layer's own skill. Tests mirror the module structure.
 
+## Hard rules
+
+- Mock only at boundaries: task `.delay` calls and anything that leaves the project. Never mock the ORM or the function under test. Mechanism: symptom is tests that pass while production fails; cause is mocked internals hiding real query, transaction or validation behaviour; fix is real database plus boundary mocks.
+- Every service change lands with its tests in the same change. Mechanism: deferred tests do not happen, and the service layer is where regressions are cheapest to catch.
+- Do not assert on private state or implementation order; assert observable outcomes (returned objects, database rows, response bodies, mock call counts at boundaries). Mechanism: implementation-coupled tests break on refactor and teach the wrong lesson.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -38,12 +44,6 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - `on_commit` triggers: tests that run inside a rolled-back transaction never fire `transaction.on_commit` callbacks. Collect them with Django's `captureOnCommitCallbacks()` to assert the task was scheduled, and check whether your pytest-django version offers an equivalent fixture.
    - Build state through real services (`user_create`) rather than raw `Model.objects.create()`, so validation runs in test state too; use fixtures for shared state.
 3. **Verify.** `python -m pytest` passes (single app: `python -m pytest apps/<name>/tests`); every changed behaviour has at least one failure-path test.
-
-## Hard rules
-
-- Mock only at boundaries: task `.delay` calls and anything that leaves the project. Never mock the ORM or the function under test. Mechanism: symptom is tests that pass while production fails; cause is mocked internals hiding real query, transaction or validation behaviour; fix is real database plus boundary mocks.
-- Every service change lands with its tests in the same change. Mechanism: deferred tests do not happen, and the service layer is where regressions are cheapest to catch.
-- Do not assert on private state or implementation order; assert observable outcomes (returned objects, database rows, response bodies, mock call counts at boundaries). Mechanism: implementation-coupled tests break on refactor and teach the wrong lesson.
 
 ## References
 

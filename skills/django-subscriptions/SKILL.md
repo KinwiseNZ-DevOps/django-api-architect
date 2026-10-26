@@ -17,6 +17,15 @@ description: >
 
 Stance: a subscription's state is decided by the billing provider and learned through its webhook, never by the customer's own browser request; the specific provider and plan model are flexible. Soft-cancel, never delete.
 
+## Hard rules
+
+- A subscription's status, plan and billing dates are set only by a verified webhook handler (or an equivalent signed server-to-server callback), never by a view the customer's browser reaches directly. Mechanism: a return URL or redirect is fully client-controlled and replayable; treating it as the source of truth lets a customer grant themselves access by guessing or replaying it.
+- Never delete a subscription row on cancellation. Mechanism: deleting destroys the audit trail needed to reconcile "did billing actually stop", and if the provider-side cancel call fails partway, deleting the local row anyway leaves your system and the provider disagreeing with no record that it happened. Fix: set a status and `cancelled_at`, keep the row.
+- Check the provider's response before trusting a cancel or update succeeded. Mechanism: issuing the provider call and then unconditionally changing local state regardless of the response repeats the same trust failure a forged redirect would cause, just from the other direction.
+- A plan's price comes from a server-side mapping, never a client-supplied plan name or price. Mechanism: if a view decides the price from a request parameter, a modified request can claim any plan at any price.
+- A failed payment moves a subscription to a distinct `past_due` state, never straight to cancelled. Mechanism: providers retry failed payments over days before giving up; cancelling on the first failure loses recoverable revenue and surprises a customer whose card was simply retried successfully a day later.
+- Catch the specific exception a missing subscription raises, never a bare `except:`. Mechanism: a bare except also swallows an unrelated bug (a typo, a missing import) and reports it as "no subscription", hiding the real failure.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -41,15 +50,6 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - On a failed payment, follow the provider's own retry schedule (dunning) and move the subscription to `past_due`, not `cancelled`; only cancel when the provider reports the retries exhausted or the customer cancels.
    - Catch the specific exception (`Subscription.DoesNotExist`), never a bare `except:`.
 3. **Verify.** Tests cover: an unsigned or forged webhook is rejected, a client-supplied plan name cannot set the price, cancelling preserves the row and its history, a payment-failure event moves status to `past_due` without deleting anything, and a duplicate webhook delivery is a no-op.
-
-## Hard rules
-
-- A subscription's status, plan and billing dates are set only by a verified webhook handler (or an equivalent signed server-to-server callback), never by a view the customer's browser reaches directly. Mechanism: a return URL or redirect is fully client-controlled and replayable; treating it as the source of truth lets a customer grant themselves access by guessing or replaying it.
-- Never delete a subscription row on cancellation. Mechanism: deleting destroys the audit trail needed to reconcile "did billing actually stop", and if the provider-side cancel call fails partway, deleting the local row anyway leaves your system and the provider disagreeing with no record that it happened. Fix: set a status and `cancelled_at`, keep the row.
-- Check the provider's response before trusting a cancel or update succeeded. Mechanism: issuing the provider call and then unconditionally changing local state regardless of the response repeats the same trust failure a forged redirect would cause, just from the other direction.
-- A plan's price comes from a server-side mapping, never a client-supplied plan name or price. Mechanism: if a view decides the price from a request parameter, a modified request can claim any plan at any price.
-- A failed payment moves a subscription to a distinct `past_due` state, never straight to cancelled. Mechanism: providers retry failed payments over days before giving up; cancelling on the first failure loses recoverable revenue and surprises a customer whose card was simply retried successfully a day later.
-- Catch the specific exception a missing subscription raises, never a bare `except:`. Mechanism: a bare except also swallows an unrelated bug (a typo, a missing import) and reports it as "no subscription", hiding the real failure.
 
 ## References
 

@@ -3,7 +3,7 @@
   "name": "Django API Architect",
   "phrase": "django",
   "rules": "skills/django-api-architect/references/always-on-rules.md",
-  "defaultMode": "on",
+  "defaultMode": "auto",
   "autoDetect": true,
   "autoMarkers": [
     {

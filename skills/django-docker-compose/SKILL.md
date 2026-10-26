@@ -15,6 +15,21 @@ description: >
 
 Stance: the Compose file defines a repeatable local environment, not production. Frozen: health-gated startup, secrets kept out of the file and out of Git, data in named volumes, and the database host being a service name. Flexible: which optional services run and how code reaches the container (bind mount or watch).
 
+## Hard rules
+
+- Use `condition: service_healthy` with a real health check, not bare `depends_on`. Mechanism: by default Compose waits only for a container to be running, not for the database to accept connections, so the app starts and its first connections fail.
+- Reach other services by service name (`db`, `redis`), never `localhost`. Mechanism: inside a container `localhost` is that container, so the app would look for a database in itself.
+- Keep database data in a named volume. Mechanism: container filesystems are ephemeral; without a volume `docker compose down` deletes the data. Mount the volume at the path the Postgres major version expects: `/var/lib/postgresql/data` up to 17, `/var/lib/postgresql` from 18, and mounting the wrong one does not persist data.
+- Bind published database and broker ports to loopback (`"127.0.0.1:5432:5432"`) or omit them. Mechanism: a port published without a host IP binds to all interfaces and can be reachable from the network, bypassing host firewall rules.
+- Quote port mappings. Mechanism: unquoted `22:22` style values can be parsed by YAML as a base-60 number.
+- Never commit `.env` or put real secrets in the Compose file. Mechanism: Git history cannot be recalled. Commit `.env.example` with safe placeholders, and prefer Compose secrets or `_FILE` variables for passwords where the image supports them, because environment variables are visible to every process and leak into logs.
+- Run `migrate` as one one-off service that the others wait on. Mechanism: several containers migrating at once race; one task that must complete first gives a single writer.
+- Run the dev server only in the local `dev` target, bound to `0.0.0.0`. Mechanism: `runserver` binds to loopback by default, which is unreachable from outside the container; it is never a production server, so production keeps Gunicorn from the runtime image.
+- Add `127.0.0.1` and `localhost` to `ALLOWED_HOSTS` for local settings, driven by an env var. Mechanism: with `DEBUG` off Django rejects unknown Host headers.
+- Run Celery worker and beat as separate services. Mechanism: one process per concern lets each restart, scale and log on its own.
+- Warn before `docker compose down -v` or deleting volumes, and confirm first. Mechanism: it permanently deletes the local database. Postgres init scripts also run only when the data directory is empty, so changing them needs a fresh volume.
+- Do not hard-code the Compose project's secrets into the `command`. Mechanism: commands are visible in `docker inspect` and process lists.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -38,21 +53,6 @@ Reason: a local file stretched into production carries dev servers, open ports a
 2. **Write.** Define services from the example in [compose-example.md](references/compose-example.md): `db`, `redis`, a one-off `migrate`, `web`, `worker` and `beat`. Give every dependency a health check, and use `depends_on` with `condition: service_healthy` (or `service_completed_successfully` for migrate).
 3. **Configure.** Put non-secret defaults in the Compose file or `.env.example`, secrets in an ignored `.env`, and read them with `env_file` and interpolation. Use `${VAR:?message}` to fail early on a missing required value.
 4. **Verify.** Run `docker compose config` to validate and render the file. Start the stack, check `docker compose ps` shows healthy services, hit the API, then run the tests inside the container. See the command list in the reference.
-
-## Hard rules
-
-- Use `condition: service_healthy` with a real health check, not bare `depends_on`. Mechanism: by default Compose waits only for a container to be running, not for the database to accept connections, so the app starts and its first connections fail.
-- Reach other services by service name (`db`, `redis`), never `localhost`. Mechanism: inside a container `localhost` is that container, so the app would look for a database in itself.
-- Keep database data in a named volume. Mechanism: container filesystems are ephemeral; without a volume `docker compose down` deletes the data. Mount the volume at the path the Postgres major version expects: `/var/lib/postgresql/data` up to 17, `/var/lib/postgresql` from 18, and mounting the wrong one does not persist data.
-- Bind published database and broker ports to loopback (`"127.0.0.1:5432:5432"`) or omit them. Mechanism: a port published without a host IP binds to all interfaces and can be reachable from the network, bypassing host firewall rules.
-- Quote port mappings. Mechanism: unquoted `22:22` style values can be parsed by YAML as a base-60 number.
-- Never commit `.env` or put real secrets in the Compose file. Mechanism: Git history cannot be recalled. Commit `.env.example` with safe placeholders, and prefer Compose secrets or `_FILE` variables for passwords where the image supports them, because environment variables are visible to every process and leak into logs.
-- Run `migrate` as one one-off service that the others wait on. Mechanism: several containers migrating at once race; one task that must complete first gives a single writer.
-- Run the dev server only in the local `dev` target, bound to `0.0.0.0`. Mechanism: `runserver` binds to loopback by default, which is unreachable from outside the container; it is never a production server, so production keeps Gunicorn from the runtime image.
-- Add `127.0.0.1` and `localhost` to `ALLOWED_HOSTS` for local settings, driven by an env var. Mechanism: with `DEBUG` off Django rejects unknown Host headers.
-- Run Celery worker and beat as separate services. Mechanism: one process per concern lets each restart, scale and log on its own.
-- Warn before `docker compose down -v` or deleting volumes, and confirm first. Mechanism: it permanently deletes the local database. Postgres init scripts also run only when the data directory is empty, so changing them needs a fresh volume.
-- Do not hard-code the Compose project's secrets into the `command`. Mechanism: commands are visible in `docker inspect` and process lists.
 
 ## References
 

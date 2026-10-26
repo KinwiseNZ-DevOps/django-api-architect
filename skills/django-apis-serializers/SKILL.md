@@ -13,6 +13,16 @@ description: >
 
 Stance: APIs are frozen as thin interfaces: one APIView class per operation, validate, delegate, serialise. Serialisation strategy is flexible as long as input and output stay separate.
 
+## Hard rules
+
+- One API class per operation; no generic views or viewsets. Mechanism: generic classes manage behaviour via serializers and hooks, which fragments logic and hides data flow; explicit classes stay greppable and simple.
+- Serializers validate and shape data only; no business logic in serializers. Mechanism: hidden `create`/`update` overrides make writes untraceable.
+- Errors always come back in the project's one JSON contract (validation as `{"field": ["message"]}` or the message-plus-extra shape; everything else as `detail`). Django's `ValidationError` must be converted to DRF's at the exception-handler boundary. Mechanism: symptom is 500s on model validation or inconsistent error shapes per endpoint; cause is Django and DRF exceptions reaching the client raw; fix is the normalising exception handler.
+  - If the project has no such handler yet, add one before services start calling `full_clean()`: register `REST_FRAMEWORK["EXCEPTION_HANDLER"]` with a small function that wraps DRF's `exception_handler` and turns `django.core.exceptions.ValidationError` into `rest_framework.exceptions.ValidationError(exc.message_dict)` (or `exc.messages` when there is no field). Symptom without it: invalid data reaches the client as a 500, because Django's `ValidationError` is not a DRF exception.
+- Never rely on DRF's default permissions. Mechanism: with `DEFAULT_PERMISSION_CLASSES` unset DRF applies `AllowAny`, so a forgotten `permission_classes` leaves an endpoint open; fix is a restrictive global default.
+- Treat throttling as abuse control, not security. Mechanism: client IPs come from `X-Forwarded-For` or `REMOTE_ADDR` and can be spoofed, clients behind one NAT share a limit, and built-in throttles can admit a few extra requests under heavy concurrency; strict guarantees need a custom throttle or an upstream control.
+- Cap pagination (`max_limit`). Mechanism: an uncapped limit lets one request pull unbounded rows.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -39,16 +49,6 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - Throttling: use `ScopedRateThrottle` with a `throttle_scope` per API group and rates in `DEFAULT_THROTTLE_RATES`. Throttles use Django's cache; behind a proxy set `NUM_PROXIES` correctly.
    - Document every endpoint with `@extend_schema` (tags, summary, request, responses including error codes).
 3. **Verify.** Endpoint tests pass; schema at `/api/schema/` renders; the response shape matches the error contract below.
-
-## Hard rules
-
-- One API class per operation; no generic views or viewsets. Mechanism: generic classes manage behaviour via serializers and hooks, which fragments logic and hides data flow; explicit classes stay greppable and simple.
-- Serializers validate and shape data only; no business logic in serializers. Mechanism: hidden `create`/`update` overrides make writes untraceable.
-- Errors always come back in the project's one JSON contract (validation as `{"field": ["message"]}` or the message-plus-extra shape; everything else as `detail`). Django's `ValidationError` must be converted to DRF's at the exception-handler boundary. Mechanism: symptom is 500s on model validation or inconsistent error shapes per endpoint; cause is Django and DRF exceptions reaching the client raw; fix is the normalising exception handler.
-  - If the project has no such handler yet, add one before services start calling `full_clean()`: register `REST_FRAMEWORK["EXCEPTION_HANDLER"]` with a small function that wraps DRF's `exception_handler` and turns `django.core.exceptions.ValidationError` into `rest_framework.exceptions.ValidationError(exc.message_dict)` (or `exc.messages` when there is no field). Symptom without it: invalid data reaches the client as a 500, because Django's `ValidationError` is not a DRF exception.
-- Never rely on DRF's default permissions. Mechanism: with `DEFAULT_PERMISSION_CLASSES` unset DRF applies `AllowAny`, so a forgotten `permission_classes` leaves an endpoint open; fix is a restrictive global default.
-- Treat throttling as abuse control, not security. Mechanism: client IPs come from `X-Forwarded-For` or `REMOTE_ADDR` and can be spoofed, clients behind one NAT share a limit, and built-in throttles can admit a few extra requests under heavy concurrency; strict guarantees need a custom throttle or an upstream control.
-- Cap pagination (`max_limit`). Mechanism: an uncapped limit lets one request pull unbounded rows.
 
 ## Next
 

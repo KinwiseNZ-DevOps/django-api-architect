@@ -19,6 +19,8 @@ SKILLS = ROOT / "skills"
 README = ROOT / "README.md"
 AGENTS = ROOT / "AGENTS.md"
 EVALS = ROOT / "evals" / "cases.jsonl"
+TRIGGERS = ROOT / "evals" / "triggers.jsonl"
+TRIGGER_TYPES = ("obvious", "paraphrase", "unrelated")
 AGENT_SOURCES = ROOT / "resources" / "agents"
 BEGIN, END = "<!-- catalogue:begin -->", "<!-- catalogue:end -->"
 BADGE_RE = re.compile(r"(badge/agent_skills-)(\d+|<N>)(-)")
@@ -34,6 +36,7 @@ PLACEHOLDER_FILES = (
     "LICENSE",
     "AGENTS.md",
     "evals/cases.jsonl",
+    "evals/triggers.jsonl",
     ".claude-plugin/plugin.json",
     ".claude-plugin/marketplace.json",
     "plugin.json",
@@ -179,6 +182,44 @@ def validate():
                 errors.append(f"{n}: {c} eval cases < {MIN_EVALS}")
     else:
         errors.append("evals/cases.jsonl missing")
+    errors += validate_triggers(names)
+    for d in skill_dirs():
+        if (d / "README.md").exists():
+            errors.append(
+                f"{d.name}: README.md inside a skill folder; put the content in SKILL.md or references/"
+            )
+    return errors
+
+
+def validate_triggers(names):
+    """Triggering tests: each skill needs obvious, paraphrase and unrelated queries."""
+    if not TRIGGERS.exists():
+        return ["evals/triggers.jsonl missing"]
+    errors = []
+    seen = {n: set() for n in names}
+    for i, line in enumerate(TRIGGERS.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            case = json.loads(line)
+        except json.JSONDecodeError:
+            errors.append(f"evals/triggers.jsonl:{i}: invalid JSON")
+            continue
+        skill, kind = case.get("skill"), case.get("type")
+        if skill not in seen:
+            errors.append(f"evals/triggers.jsonl:{i}: unknown skill {skill}")
+        elif kind not in TRIGGER_TYPES:
+            errors.append(
+                f"evals/triggers.jsonl:{i}: type must be one of {', '.join(TRIGGER_TYPES)}"
+            )
+        elif not case.get("query"):
+            errors.append(f"evals/triggers.jsonl:{i}: needs a query")
+        else:
+            seen[skill].add(kind)
+    for n, kinds in seen.items():
+        for kind in TRIGGER_TYPES:
+            if kind not in kinds:
+                errors.append(f"{n}: no '{kind}' trigger query in evals/triggers.jsonl")
     return errors
 
 
@@ -425,8 +466,12 @@ def validate_portable_plugin():
             errors.append(f"plugin.json: {key} differs from .claude-plugin/plugin.json")
     if not data.get("description"):
         errors.append("plugin.json: description is required")
-    if (data.get("author") or {}).get("name") != (claude.get("author") or {}).get("name"):
-        errors.append("plugin.json: author.name differs from .claude-plugin/plugin.json")
+    if (data.get("author") or {}).get("name") != (claude.get("author") or {}).get(
+        "name"
+    ):
+        errors.append(
+            "plugin.json: author.name differs from .claude-plugin/plugin.json"
+        )
     if not market.exists():
         return errors + [".agents/plugins/marketplace.json missing"]
     mdata, err = load_json(market)
@@ -436,21 +481,37 @@ def validate_portable_plugin():
         errors.append(".agents/plugins/marketplace.json: name is required")
     entries = mdata.get("plugins")
     if not isinstance(entries, list) or len(entries) != 1:
-        errors.append(".agents/plugins/marketplace.json: plugins must hold exactly one entry (this repo)")
+        errors.append(
+            ".agents/plugins/marketplace.json: plugins must hold exactly one entry (this repo)"
+        )
     else:
         entry = entries[0]
         if entry.get("name") != data.get("name"):
-            errors.append(".agents/plugins/marketplace.json: plugin entry name differs from plugin.json name")
+            errors.append(
+                ".agents/plugins/marketplace.json: plugin entry name differs from plugin.json name"
+            )
         source = entry.get("source") or {}
         if source.get("source") != "local" or source.get("path") != "./":
-            errors.append('.agents/plugins/marketplace.json: plugin source must be local and use "./"')
+            errors.append(
+                '.agents/plugins/marketplace.json: plugin source must be local and use "./"'
+            )
         policy = entry.get("policy") or {}
-        if policy.get("installation") not in {"AVAILABLE", "INSTALLED_BY_DEFAULT", "NOT_AVAILABLE"}:
-            errors.append(".agents/plugins/marketplace.json: plugin installation policy is invalid")
+        if policy.get("installation") not in {
+            "AVAILABLE",
+            "INSTALLED_BY_DEFAULT",
+            "NOT_AVAILABLE",
+        }:
+            errors.append(
+                ".agents/plugins/marketplace.json: plugin installation policy is invalid"
+            )
         if policy.get("authentication") not in {"ON_INSTALL", "ON_FIRST_USE"}:
-            errors.append(".agents/plugins/marketplace.json: plugin authentication policy is invalid")
+            errors.append(
+                ".agents/plugins/marketplace.json: plugin authentication policy is invalid"
+            )
         if not entry.get("category"):
-            errors.append(".agents/plugins/marketplace.json: plugin category is required")
+            errors.append(
+                ".agents/plugins/marketplace.json: plugin category is required"
+            )
     return errors
 
 

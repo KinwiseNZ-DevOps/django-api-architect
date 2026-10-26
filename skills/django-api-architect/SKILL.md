@@ -14,6 +14,14 @@ description: >
 
 Stance: the architecture is frozen (thin interfaces, business logic in services and selectors), the implementation inside those boxes is flexible. This skill routes to the right specialist and enforces the guardrails every change must satisfy.
 
+## Hard rules
+
+- Business logic never goes in APIs, views, serializers, forms, model `save`, custom managers or signals. Mechanism: symptom is logic that cannot be traced or tested in one place; cause is logic scattered across interface layers; fix is a service or selector with keyword-only arguments.
+- Interfaces (APIs, tasks) validate input and call services; they contain no business logic. Mechanism: duplicated or divergent behaviour across interfaces; fixed by keeping one service as the single implementation.
+- Read the target project's own conventions before changing it; these skills describe the default architecture, and the project in front of you wins where they differ. Mechanism: blind application of defaults creates drift inside an existing codebase.
+- Make the smallest correct change and verify it with the project's own test suite. Mechanism: unverified refactors are the main way service layer projects regress.
+- Treat the user's description of their own system as the working fact. Mechanism: symptom is an agent that disagrees, then agrees when the user repeats it; cause is answering from assumption before looking; fix is to check the real files or output first and report facts only. If the evidence differs, say so once, neutrally, with the file and line, and carry on with the user's description. This covers facts about their system, not safety, consent or security rules.
+
 ## Gate
 
 Route by the layer the task actually touches. When in doubt, ask which file the change belongs in; the app pack shape decides that.
@@ -49,14 +57,6 @@ Use this delegation when the runtime can start or hand off to an available agent
 ## When the project does not have the shape yet
 
 These skills assume a shared package for the error handler and pagination, app manifests, a settings package, drf-spectacular and pytest configured. Check for each before relying on it. If one is missing, say so in one line and follow the project's own way of doing that job; add the missing piece only when the task needs it, keep it minimal, and ask first when it needs a new dependency. Mechanism: copying the default structure into a project that does not have it creates a second, half-used convention that nothing else follows.
-
-## Hard rules
-
-- Business logic never goes in APIs, views, serializers, forms, model `save`, custom managers or signals. Mechanism: symptom is logic that cannot be traced or tested in one place; cause is logic scattered across interface layers; fix is a service or selector with keyword-only arguments.
-- Interfaces (APIs, tasks) validate input and call services; they contain no business logic. Mechanism: duplicated or divergent behaviour across interfaces; fixed by keeping one service as the single implementation.
-- Read the target project's own conventions before changing it; these skills describe the default architecture, and the project in front of you wins where they differ. Mechanism: blind application of defaults creates drift inside an existing codebase.
-- Make the smallest correct change and verify it with the project's own test suite. Mechanism: unverified refactors are the main way service layer projects regress.
-- Treat the user's description of their own system as the working fact. Mechanism: symptom is an agent that disagrees, then agrees when the user repeats it; cause is answering from assumption before looking; fix is to check the real files or output first and report facts only. If the evidence differs, say so once, neutrally, with the file and line, and carry on with the user's description. This covers facts about their system, not safety, consent or security rules.
 
 ## Next
 

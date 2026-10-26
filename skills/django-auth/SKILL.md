@@ -13,6 +13,13 @@ description: >
 
 Stance: JWT via `rest_framework_simplejwt` is the primary flow for SPA clients; OTP codes are the passwordless flow; the admin carries its own OTP second factor. Library views are wrapped, never reimplemented.
 
+## Hard rules
+
+- Wrap library auth views; add behaviour via serializer subclasses and view subclasses. Mechanism: hand-rolled token logic drifts from library security fixes; wrapping keeps upgrades safe.
+- Never store OTP codes in plaintext, and always consume them on use or on failed match. Mechanism: symptom is replayable or brute-forceable codes; cause is persistent plaintext codes; fix is hashed, TTL-bound, single-use storage with constant-time comparison.
+- A failed login must never trigger side effects such as new-IP alerts or recording the IP on the user. Mechanism: symptom is attacker-supplied data stored on a real user's record, or alerts for attempts that never authenticated; cause is running the side effect before the credentials are verified; fix is hooking after `super().validate(attrs)` succeeds. Security logging of failed attempts is separate and allowed.
+- Login gets its own stricter anonymous throttle, separate from general API scopes. Mechanism: credential stuffing otherwise borrows the whole API's rate budget.
+
 ## Agent dispatch
 
 Before handling a request, follow the agent selection workflow in [django-api-architect](../django-api-architect/SKILL.md), including when this specialist skill is invoked directly. Give the selected agent this skill's instructions. If the runtime cannot discover or invoke an agent, continue the work yourself using this skill.
@@ -34,13 +41,6 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - Send OTP email through a Celery task with bounded retries; keep `OTP_SHOW_CODE_IN_UI` off in production.
    - Document auth endpoints in the OpenAPI schema with their failure codes: 401 invalid credentials, 400 blacklisted token, 429 throttled.
 3. **Verify.** Tests cover: successful login issues both tokens, wrong password does not record IP data, refresh rotates and old refresh tokens are blacklisted, OTP single-use semantics, and login throttle engagement.
-
-## Hard rules
-
-- Wrap library auth views; add behaviour via serializer subclasses and view subclasses. Mechanism: hand-rolled token logic drifts from library security fixes; wrapping keeps upgrades safe.
-- Never store OTP codes in plaintext, and always consume them on use or on failed match. Mechanism: symptom is replayable or brute-forceable codes; cause is persistent plaintext codes; fix is hashed, TTL-bound, single-use storage with constant-time comparison.
-- A failed login must never trigger side effects such as new-IP alerts or recording the IP on the user. Mechanism: symptom is attacker-supplied data stored on a real user's record, or alerts for attempts that never authenticated; cause is running the side effect before the credentials are verified; fix is hooking after `super().validate(attrs)` succeeds. Security logging of failed attempts is separate and allowed.
-- Login gets its own stricter anonymous throttle, separate from general API scopes. Mechanism: credential stuffing otherwise borrows the whole API's rate budget.
 
 ## References
 
