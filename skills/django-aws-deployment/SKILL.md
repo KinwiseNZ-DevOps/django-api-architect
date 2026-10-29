@@ -22,6 +22,7 @@ Stance: the app is built once and configured by environment. Frozen: no secrets 
 - A secret read from the environment is fixed when the task starts. Mechanism: after a secret changes, force a new deployment or start a new task (stated in the ECS documentation for Secrets Manager values).
 - Do not copy version pins from tutorials. Mechanism: the source articles pin old Python and Django versions; use the project's own pins and the platform's currently supported runtime.
 - Never run AWS commands that create or delete resources without a person's yes. Mechanism: they cost money and can destroy data.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

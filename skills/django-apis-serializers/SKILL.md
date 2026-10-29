@@ -23,6 +23,7 @@ Stance: APIs are frozen as thin interfaces: one APIView class per operation, val
 - Never rely on DRF's default permissions. Mechanism: with `DEFAULT_PERMISSION_CLASSES` unset DRF applies `AllowAny`, so a forgotten `permission_classes` leaves an endpoint open; fix is a restrictive global default.
 - Treat throttling as abuse control, not security. Mechanism: client IPs come from `X-Forwarded-For` or `REMOTE_ADDR` and can be spoofed, clients behind one NAT share a limit, and built-in throttles can admit a few extra requests under heavy concurrency; strict guarantees need a custom throttle or an upstream control.
 - Cap pagination (`max_limit`). Mechanism: an uncapped limit lets one request pull unbounded rows.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

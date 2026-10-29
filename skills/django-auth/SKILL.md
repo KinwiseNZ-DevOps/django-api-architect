@@ -20,6 +20,7 @@ Stance: JWT via `rest_framework_simplejwt` is the primary flow for SPA clients; 
 - Never store OTP codes in plaintext, and always consume them on use or on failed match. Mechanism: symptom is replayable or brute-forceable codes; cause is persistent plaintext codes; fix is hashed, TTL-bound, single-use storage with constant-time comparison.
 - A failed login must never trigger side effects such as new-IP alerts or recording the IP on the user. Mechanism: symptom is attacker-supplied data stored on a real user's record, or alerts for attempts that never authenticated; cause is running the side effect before the credentials are verified; fix is hooking after `super().validate(attrs)` succeeds. Security logging of failed attempts is separate and allowed.
 - Login gets its own stricter anonymous throttle, separate from general API scopes. Mechanism: credential stuffing otherwise borrows the whole API's rate budget.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

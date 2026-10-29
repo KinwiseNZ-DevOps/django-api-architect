@@ -20,6 +20,7 @@ Stance: the pack shape and the core-versus-optional split are frozen; file conte
 - Settings live in one file per environment plus one partial per concern, composed in `base.py`; environment differences are environment variables, not divergent code. Mechanism: duplicated settings drift between environments; builder functions and partials keep single sources.
 - Required secrets have no default (fail fast at import); optional values carry safe defaults. Never commit `.env`; ship `.env.example` instead.
 - Never edit a migration that has already been applied in another environment. Mechanism: symptom is a schema that no longer matches any migration and cannot be replayed; cause is editing history that other environments have already recorded; fix is a new corrective migration, never a rewrite of an old one.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

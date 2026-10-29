@@ -21,6 +21,7 @@ Stance: a subscription's state is decided by the billing provider and learned th
 - A plan's price comes from a server-side mapping, never a client-supplied plan name or price. Mechanism: if a view decides the price from a request parameter, a modified request can claim any plan at any price.
 - A failed payment moves a subscription to a distinct `past_due` state, never straight to cancelled. Mechanism: providers retry failed payments over days before giving up; cancelling on the first failure loses recoverable revenue and surprises a customer whose card was simply retried successfully a day later.
 - Catch the specific exception a missing subscription raises, never a bare `except:`. Mechanism: a bare except also swallows an unrelated bug (a typo, a missing import) and reports it as "no subscription", hiding the real failure.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

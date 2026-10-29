@@ -18,6 +18,7 @@ Stance: the pytest layout and the mock boundaries are frozen; what counts as eno
 - Mock only at boundaries: task `.delay` calls and anything that leaves the project. Never mock the ORM or the function under test. Mechanism: symptom is tests that pass while production fails; cause is mocked internals hiding real query, transaction or validation behaviour; fix is real database plus boundary mocks.
 - Every service change lands with its tests in the same change. Mechanism: deferred tests do not happen, and the service layer is where regressions are cheapest to catch.
 - Do not assert on private state or implementation order; assert observable outcomes (returned objects, database rows, response bodies, mock call counts at boundaries). Mechanism: implementation-coupled tests break on refactor and teach the wrong lesson.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

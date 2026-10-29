@@ -27,6 +27,7 @@ Stance: the image is a reproducible build artefact. Frozen: a non-root runtime u
 - If `collectstatic` runs at build time, pass its required settings inline for that one `RUN`, not as persistent `ENV`. Mechanism: required secrets have no default, so the command needs values, and persistent `ENV` would bake them into the image.
 - Allow the health check's host in `ALLOWED_HOSTS`. Mechanism: with `DEBUG` off Django rejects unknown Host headers, so a check calling `127.0.0.1` fails as unhealthy unless that host is allowed.
 - Set Gunicorn `--workers` deliberately. Mechanism: the Gunicorn docs suggest starting at (2 x CPU cores) + 1 and adjusting under load; sync workers need a buffering proxy such as nginx in front.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

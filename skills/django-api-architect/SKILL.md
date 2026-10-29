@@ -21,6 +21,7 @@ Stance: the architecture is frozen (thin interfaces, business logic in services 
 - Read the target project's own conventions before changing it; these skills describe the default architecture, and the project in front of you wins where they differ. Mechanism: blind application of defaults creates drift inside an existing codebase.
 - Make the smallest correct change and verify it with the project's own test suite. Mechanism: unverified refactors are the main way service layer projects regress.
 - Treat the user's description of their own system as the working fact. Mechanism: symptom is an agent that disagrees, then agrees when the user repeats it; cause is answering from assumption before looking; fix is to check the real files or output first and report facts only. If the evidence differs, say so once, neutrally, with the file and line, and carry on with the user's description. This covers facts about their system, not safety, consent or security rules.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Gate
 

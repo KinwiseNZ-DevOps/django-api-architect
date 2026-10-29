@@ -26,6 +26,7 @@ Stance: the Compose file defines a repeatable local environment, not production.
 - Run Celery worker and beat as separate services. Mechanism: one process per concern lets each restart, scale and log on its own.
 - Warn before `docker compose down -v` or deleting volumes, and confirm first. Mechanism: it permanently deletes the local database. Postgres init scripts also run only when the data directory is empty, so changing them needs a fresh volume.
 - Do not hard-code the Compose project's secrets into the `command`. Mechanism: commands are visible in `docker inspect` and process lists.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

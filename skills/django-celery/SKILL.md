@@ -20,6 +20,7 @@ Stance: tasks are interfaces, not logic. A task fetches its inputs, calls a serv
 - Always trigger tasks via `transaction.on_commit` inside transactions. Mechanism: symptom is intermittent "object does not exist" errors in workers; cause is the task running before the transaction commits; fix is the on_commit hook.
 - Import services inside the task body and tasks at module level (aliased `_task` on name collision). Mechanism: the reverse ordering creates circular imports between tasks and services.
 - Bounded retries only; unbounded retry loops mask permanent failures. Mechanism: a poison message otherwise retries forever, consuming workers.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 

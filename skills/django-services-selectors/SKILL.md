@@ -23,6 +23,7 @@ Stance: services write, selectors read, and both are plain functions with keywor
 - Never make a network or external API call inside an open `atomic()` block. Mechanism: the transaction holds database resources for as long as it is open, so a slow external call (or its retries and timeouts) holds them for that long too. Fix: call the external system first, then open a short transaction for the local write once its result is known.
 - A bulk write (`update()`, `delete()`, `bulk_create()`, `bulk_update()`) does not call `save()`/`delete()` or send signals. Mechanism: any side effect a service relies on through a signal or an overridden `save()` silently does not run for rows touched this way. Fix: give the bulk path its own explicit side effect, or fall back to the per-instance path when the side effect matters.
 - Never build a raw SQL string with formatting, and never quote a `%s` placeholder. Mechanism: `Manager.raw()` and `connection.cursor()` are only safe from SQL injection when the value is passed through `params` with the placeholder left unquoted; string formatting or quoting it defeats that regardless of where the value came from. Fix: `params=[value]` with an unquoted `%s`, never `% value` or `'%s'`.
+- Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
 
