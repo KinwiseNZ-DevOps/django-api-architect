@@ -63,6 +63,20 @@ These skills assume a shared package for the error handler and pagination, app m
 
 All specialist skills are linked in the gate table above.
 
+## Works with other repos
+
+Back-end work depends on security. Front-end repos depend on this one.
+
+| Repo or skill | Relationship | Hand off when |
+|---|---|---|
+| security-specialist | This repo depends on it | Authentication, secrets, dependency risk or a vulnerability review. Use its review skills before calling API work safe. |
+| frontend-developer | It depends on this repo | A front-end task needs an API change; this repo owns the server side and the response contract. |
+| flutter-developer | It depends on this repo | A Flutter task needs an API change; this repo owns the server side and the response contract. |
+
+If a companion plugin is not installed, say the hand-off was skipped. Never edit another repo's code or rules from here.
+
+The full map is in `skills-repos-dependency-map.md` beside the repos.
+
 ## Always-on mode
 
 A start-up hook adds [always-on-rules.md](references/always-on-rules.md) to Claude Code sessions in matching projects. It is the single source of those rules, so edit it, not a copy. Say "stop django mode" to pause it. The README covers the saved mode and the safety checks.

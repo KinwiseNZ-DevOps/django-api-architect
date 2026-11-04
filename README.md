@@ -38,6 +38,7 @@ Table of contents:
 - [Validate](#validate)
 - [Layout](#layout)
 - [Credits](#credits)
+- [Works with other repos](#works-with)
 - [Status and limits](#status-and-limits)
 
 ---
@@ -249,6 +250,13 @@ Details in the skills are checked against the official documentation, linked fro
 - [Django REST framework](https://www.django-rest-framework.org/): permissions and throttling behaviour.
 - [Django documentation](https://docs.djangoproject.com/en/6.1/): transactions and `on_commit`.
 - [Django Styleguide](https://github.com/HackSoftware/Django-Styleguide): the service and selector layer theory.
+
+---
+
+<a id="works-with"></a>
+## 🤝 Works with other repos
+
+Back-end work depends on security. Front-end repos depend on this one. See the Works with other repos section of the router skill for when to hand off. The dependency map is `skills-repos-dependency-map.md` beside the repos.
 
 ---
 
