@@ -72,6 +72,7 @@ Back-end work depends on security. Front-end repos depend on this one.
 | security-specialist | This repo depends on it | Authentication, secrets, dependency risk or a vulnerability review. Use its review skills before calling API work safe. |
 | frontend-developer | It depends on this repo | A front-end task needs an API change; this repo owns the server side and the response contract. |
 | flutter-developer | It depends on this repo | A Flutter task needs an API change; this repo owns the server side and the response contract. |
+| kinwise-analytics | It depends on this repo | Analytics needs a new selector, endpoint or export. This repo owns the server side; analytics describes the need and never edits server code. |
 
 If a companion plugin is not installed, say the hand-off was skipped. Never edit another repo's code or rules from here.
 
