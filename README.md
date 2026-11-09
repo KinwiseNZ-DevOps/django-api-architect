@@ -21,7 +21,7 @@
 
 [![Validate skills](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml/badge.svg)](https://github.com/KinwiseNZ-DevOps/django-api-architect/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Agent skills](https://img.shields.io/badge/agent_skills-12-8A2BE2)](https://agentskills.io)
+[![Agent skills](https://img.shields.io/badge/agent_skills-15-8A2BE2)](https://agentskills.io)
 [![Format](https://img.shields.io/badge/format-SKILL.md-orange)](https://agentskills.io/specification)
 [![Tooling](https://img.shields.io/badge/tooling-stdlib_only-success)](scripts/skills_tool.py)
 
@@ -65,8 +65,11 @@ Install supplied Claude Code, GitHub Copilot or Codex agent profiles into a proj
 | [`django-celery`](skills/django-celery/SKILL.md) | Governs Celery task structure, retries, transaction-safe task triggering, webhook dispatch chains, periodic tasks and Celery configuration. |
 | [`django-docker-compose`](skills/django-docker-compose/SKILL.md) | Governs the local Docker Compose stack for Django API projects. |
 | [`django-docker-images`](skills/django-docker-images/SKILL.md) | Governs Dockerfiles and container images for Django API projects. |
+| [`django-models-migrations`](skills/django-models-migrations/SKILL.md) | Governs model design, safe schema changes and production database settings for Django API projects. |
+| [`django-observability`](skills/django-observability/SKILL.md) | Governs how a Django API reports what it is doing and what went wrong. |
 | [`django-open-banking`](skills/django-open-banking/SKILL.md) | Governs open banking integrations in Django API projects. |
 | [`django-project-structure`](skills/django-project-structure/SKILL.md) | Governs Django app layout, the app pack shape, app manifests, and settings organisation for service layer API projects. |
+| [`django-release-governance`](skills/django-release-governance/SKILL.md) | Governs how Django API changes are reviewed, tested, released, switched on and rolled back. |
 | [`django-services-selectors`](skills/django-services-selectors/SKILL.md) | Governs the service and selector layer: writing business logic, validation placement, transactions, and update helpers. |
 | [`django-subscriptions`](skills/django-subscriptions/SKILL.md) | Governs subscription lifecycle management in Django API projects. |
 | [`django-testing`](skills/django-testing/SKILL.md) | Governs the test suite for Django API projects: pytest layout, what to test at each layer, mocking boundaries, and test-state construction. |
@@ -89,6 +92,9 @@ flowchart TD
     R --> D1["🐳 django-docker-images<br/>Dockerfile, non-root, production server"]
     R --> D3["☁️ django-aws-deployment<br/>Fargate, App Runner, Elastic Beanstalk"]
     R --> D2["🧱 django-docker-compose<br/>local stack, health-gated startup, env files"]
+    R --> MM["🗄️ django-models-migrations<br/>models, constraints, safe migrations"]
+    R --> OBS["📈 django-observability<br/>logs, errors, health, alerts"]
+    R --> REL["🚦 django-release-governance<br/>review, CI, tags, flags, rollback"]
     R --> OB["🏦 django-open-banking<br/>BlinkPay payments and account data, provider-agnostic"]
     R --> SUB["🔁 django-subscriptions<br/>plans, lifecycle, webhook-driven state, dunning"]
 ```
@@ -186,6 +192,7 @@ Privacy: `packageGuard` and `licenseGuard` send package names, and `linkGuard` s
 | Just say… | What you get | Skill used |
 |---|---|---|
 | `where does this logic go?` | placement decision, pack shape | *django-project-structure* |
+| `add a model / write a migration` | safe model design, constraints, expand-then-contract migrations, database settings | *django-models-migrations* |
 | `write the service / selector` | business logic with validation and transactions | *django-services-selectors* |
 | `add an endpoint` | thin API class, serializers, pagination, error contract | *django-apis-serializers* |
 | `login / OTP / token` | JWT and OTP flows, throttling, admin second factor | *django-auth* |
@@ -194,6 +201,8 @@ Privacy: `packageGuard` and `licenseGuard` send package names, and `linkGuard` s
 | `deploy this to AWS` | Platform choice, production settings, health checks | *django-aws-deployment* |
 | `set up local docker` | Compose stack with healthy database, broker, worker and beat | *django-docker-compose* |
 | `test this` | pytest layout, mock boundaries, failure paths | *django-testing* |
+| `add logging / error tracking / health check` | request ids, safe logs, error tracker, liveness and readiness | *django-observability* |
+| `set up CI / release this / roll back` | protected branches, CI job, tags, flags, revert-first, incident review | *django-release-governance* |
 
 > [!NOTE]
 > Skills also trigger on their own when your request matches. In Claude Code you can also invoke one explicitly with `/<skill-name>`, but the plain phrases above are shorter and work across every agent.

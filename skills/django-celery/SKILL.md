@@ -20,6 +20,10 @@ Stance: tasks are interfaces, not logic. A task fetches its inputs, calls a serv
 - Always trigger tasks via `transaction.on_commit` inside transactions. Mechanism: symptom is intermittent "object does not exist" errors in workers; cause is the task running before the transaction commits; fix is the on_commit hook.
 - Import services inside the task body and tasks at module level (aliased `_task` on name collision). Mechanism: the reverse ordering creates circular imports between tasks and services.
 - Bounded retries only; unbounded retry loops mask permanent failures. Mechanism: a poison message otherwise retries forever, consuming workers.
+- Give every task a hard `time_limit` (and a lower `soft_time_limit` where cleanup is needed). Mechanism: symptom is a queue that stops moving; cause is a few stuck tasks holding every worker; fix is a limit that kills them.
+- Pass ids and plain values to tasks, never model instances, and keep tasks safe to run twice. Mechanism: a queued object is a stale copy by the time it runs, and retries or redelivery run the same message again; fix is to reload by id and make the work idempotent.
+- Change a task's arguments compatibly: add new arguments with defaults, and remove old ones only after queued messages using them are gone. Mechanism: messages already in the queue carry the old arguments and fail on a new signature.
+- Run exactly one beat process. Mechanism: symptom is every periodic task running twice; cause is two schedulers; fix is one beat, with failover handled by the platform rather than a second copy.
 - Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
@@ -41,7 +45,12 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - Write the task as fetch-then-delegate; retries use `self.retry(exc=..., countdown=...)` with a bounded `max_retries` and an increasing countdown; the exhausted case goes to an `on_failure` callback named `_<task_name>_failure`, which calls a service.
    - Inside `@transaction.atomic` services, trigger with `transaction.on_commit(lambda: task.delay(...))`, never directly. `on_commit` callbacks take no arguments (bind with a lambda or `functools.partial`), run immediately if there is no open transaction, and are discarded if the transaction rolls back. With the default `robust=False`, an exception in one callback skips the later ones registered in the same transaction.
    - Webhook providers: one endpoint that verifies the signature (400 on failure), logs the event idempotently in an event table inside a transaction, dispatches a dispatcher task, and acknowledges 200 within the provider's timeout. The dispatcher maps event types to handlers, skips already-processed events, marks `processed_at` after success, and retries on handler failure. Handlers call idempotent service upserts.
+   - Split big jobs: a task that loops over many users or rows should start one small task per item, so one failure retries one item and no task runs long.
+   - Separate queues: send slow bulk work to its own queue (`queue=` in `apply_async` or routing settings) and run a worker for it, so it cannot delay time-sensitive tasks. Use `apply_async` once you need options such as `queue`, `countdown` or `priority`; `delay` is shorthand without them.
+   - Work the business depends on (a payment, a renewal, a statement) gets a periodic reconciliation task that finds what should have happened and did not, and calls the service again. Mechanism: a lost message leaves no error to retry.
 3. **Verify.** Task tests confirm delegation, retry-on-failure and exhaustion behaviour (see django-testing); no task duplicates logic that exists in a service.
+
+Django 6.0 ships a built-in tasks framework (`django.tasks`), but its release notes say the built-in backends are mainly for development and testing and that Django provides no worker process. This house style keeps Celery for production work; check the current Django tasks documentation before changing that.
 
 ## Configuration
 

@@ -4,6 +4,14 @@ All notable changes to this plugin are listed here, newest first. To cut a relea
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-10
+
+- Added django-observability (safe logging, request ids, error tracking, liveness and readiness checks, alerts) and django-release-governance (protected branches, CI, tags, hotfix and rollback, feature flags, incident review).
+- Added django-models-migrations (on_delete choices, money fields, named constraints, expand-then-contract migrations, backfills, indexes, database timeouts and connection settings).
+- Added HTTPS-only production settings (project structure), superuser password handling and session cleanup (auth), and matching AWS checklist lines.
+- Added rules for signal wiring (services and selectors), admin hardening (auth) and explicit serializer fields (APIs).
+- Added rules to existing skills: app boundaries, a shared common app and CORS in project structure; API versioning and no blanket except in APIs; frozen time, production database engine and collection checks in testing; time limits, ids not objects, compatible signatures, one beat and reconciliation in Celery; groups, user model timing and no built-in token login in auth; caching rules in selectors; database and cache hardening and short-lived CI roles in AWS deployment.
+
 ## [0.10.1] - 2026-11-07
 
 - Added kinwise-analytics to the Works with other repos table: analytics depends on this repo for any new selector, endpoint or export.

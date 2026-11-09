@@ -34,3 +34,12 @@
 {"skill": "django-testing", "type": "obvious", "query": "Write pytest tests for our transaction service and API."}
 {"skill": "django-testing", "type": "paraphrase", "query": "How do I check my Django code works without calling the real payment provider?"}
 {"skill": "django-testing", "type": "unrelated", "query": "Write a service that creates a transaction."}
+{"skill": "django-observability", "type": "obvious", "query": "Add request ids and structured logging to our Django API."}
+{"skill": "django-observability", "type": "paraphrase", "query": "When something breaks in production nobody on the team finds out until a customer emails. How do we get told first?"}
+{"skill": "django-observability", "type": "unrelated", "query": "Design the onboarding screens for the Flutter app."}
+{"skill": "django-release-governance", "type": "obvious", "query": "Set up branch protection and a CI pipeline for our Django repo."}
+{"skill": "django-release-governance", "type": "paraphrase", "query": "Last night's release broke checkout. What is the right order of steps to get back to normal and learn from it?"}
+{"skill": "django-release-governance", "type": "unrelated", "query": "Write a Dockerfile that runs gunicorn as a non-root user."}
+{"skill": "django-models-migrations", "type": "obvious", "query": "Add a new Invoice model with a foreign key to Customer and write the migration."}
+{"skill": "django-models-migrations", "type": "paraphrase", "query": "Our deploy takes the site down for a minute whenever we add a column to the big orders table. How do we change the database without that?"}
+{"skill": "django-models-migrations", "type": "unrelated", "query": "Write a GitHub Actions workflow that runs flake8."}

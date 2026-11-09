@@ -18,6 +18,8 @@ Stance: the pytest layout and the mock boundaries are frozen; what counts as eno
 - Mock only at boundaries: task `.delay` calls and anything that leaves the project. Never mock the ORM or the function under test. Mechanism: symptom is tests that pass while production fails; cause is mocked internals hiding real query, transaction or validation behaviour; fix is real database plus boundary mocks.
 - Every service change lands with its tests in the same change. Mechanism: deferred tests do not happen, and the service layer is where regressions are cheapest to catch.
 - Do not assert on private state or implementation order; assert observable outcomes (returned objects, database rows, response bodies, mock call counts at boundaries). Mechanism: implementation-coupled tests break on refactor and teach the wrong lesson.
+- Run the suite on the same database engine as production, never SQLite for speed. Mechanism: symptom is a green suite and a production failure on a constraint, lock or type; cause is an engine that behaves differently; fix is the production engine in a throwaway test database.
+- Never read the real clock in a test that depends on dates; freeze time. Mechanism: symptom is tests that fail only near midnight, month end or a time zone change; cause is a hardcoded or live "now"; fix is a time-freezing library such as freezegun or time-machine (ask before adding a dependency) and `timezone.now()` in the code.
 - Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
@@ -39,11 +41,14 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
 2. **Fix.** Write tests by layer:
    - Services: exhaustive coverage of the business logic, hitting the database, with task calls and everything outside the project mocked. Patch at the point of use (`apps.billing.services.stripe.Customer.create`), not at the provider's own module.
    - Selectors: coverage of filtering and ownership scoping; verify a caller cannot fetch another user's rows.
-   - APIs: status codes, response shapes, the error contract, permission outcomes.
+   - APIs: status codes, response shapes, the error contract, permission outcomes. Give every endpoint at least one full authentication test (no credentials gives 401, a valid user succeeds, a user without the right permission gets 403), because removing a permission class is a one-line change that no other test notices.
    - Models: only when the model adds validation, properties or methods; validation tests need no database.
    - Tasks: that they call the service, retry on failure, and stop after `max_retries`.
    - `on_commit` triggers: tests that run inside a rolled-back transaction never fire `transaction.on_commit` callbacks. Collect them with Django's `captureOnCommitCallbacks()` to assert the task was scheduled, and check whether your pytest-django version offers an equivalent fixture.
    - Build state through real services (`user_create`) rather than raw `Model.objects.create()`, so validation runs in test state too; use fixtures for shared state.
+   - Collection: a test file that does not match `python_files` is never run and never fails. After adding a file, run `python -m pytest --collect-only -q` and confirm its tests are listed.
+   - Setup cost: keep model factories (`factory_boy`, ask before adding) in one `factories.py` per app and use them for background rows, while the rows a test is about still go through services. Create shared read-only rows once per module or class (a wider fixture scope, or `setUpTestData` for Django test classes), not once per test, when the suite slows down.
+   - Slow or special tests carry a registered `pytest` marker so a fast subset can run locally and the full set in CI.
 3. **Verify.** `python -m pytest` passes (single app: `python -m pytest apps/<name>/tests`); every changed behaviour has at least one failure-path test.
 
 ## References

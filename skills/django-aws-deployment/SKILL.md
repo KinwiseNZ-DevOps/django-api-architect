@@ -21,6 +21,7 @@ Stance: the app is built once and configured by environment. Frozen: no secrets 
 - Run `migrate` once per release, not on every start with more than one instance. Mechanism: several instances race to change the same tables. Elastic Beanstalk offers a leader-only command for this; on ECS use a one-off task (inference for ECS, supported by the Elastic Beanstalk documentation for its own platform).
 - A secret read from the environment is fixed when the task starts. Mechanism: after a secret changes, force a new deployment or start a new task (stated in the ECS documentation for Secrets Manager values).
 - Do not copy version pins from tutorials. Mechanism: the source articles pin old Python and Django versions; use the project's own pins and the platform's currently supported runtime.
+- Let CI sign in to AWS with a short-lived role (OpenID Connect), not stored access keys. Mechanism: a stored key works for anyone who copies it until it is revoked, while a role session expires; fix is a role that trusts only this repository, with the least permissions the deploy needs.
 - Never run AWS commands that create or delete resources without a person's yes. Mechanism: they cost money and can destroy data.
 - Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
@@ -59,9 +60,16 @@ Reason: AWS actions cost money and change live systems, and a secret committed t
 - [ ] Database is managed (RDS), not SQLite
 - [ ] Static files served (WhiteNoise or S3 with CloudFront)
 - [ ] Behind the load balancer: HTTPS and proxy header settings correct
+- [ ] Secure cookies, HTTPS redirect and HSTS set; `check --deploy` has no unexplained warning
+- [ ] No superuser or password created inside a build or start command
 - [ ] Health check path returns 200 without logging in
 - [ ] Migrations run once per release
 - [ ] Logs reach CloudWatch
+- [ ] Database: deletion protection on, Multi-AZ for production, automated backups, encrypted at rest, not publicly accessible, alarms set
+- [ ] Cache: managed, with failover for production, so a cache outage does not send every read to the database
+- [ ] App instances in private subnets behind the load balancer; the database and cache accept traffic only from the app's security group
+- [ ] Rollouts keep healthy old capacity until new capacity passes health checks
+- [ ] CI signs in with a short-lived role, not stored keys
 - [ ] Placeholders used for account IDs, ARNs and hostnames
 ```
 

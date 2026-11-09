@@ -32,10 +32,13 @@ Route by the layer the task actually touches. When in doubt, ask which file the 
 | Task spans several layers (new feature end to end) | Start at django-project-structure, then route per layer |
 | Where business logic lives, app layout, settings | [django-project-structure](../django-project-structure/SKILL.md) |
 | Writing or changing API classes, serializers, filters, pagination, error shape | [django-apis-serializers](../django-apis-serializers/SKILL.md) |
+| Models, fields, indexes, constraints, migrations, backfills, database connection settings | [django-models-migrations](../django-models-migrations/SKILL.md) |
 | Writing or changing services, selectors, validation, transactions | [django-services-selectors](../django-services-selectors/SKILL.md) |
 | Writing or changing tests, mocking, factories | [django-testing](../django-testing/SKILL.md) |
 | Login, tokens, OTP, authentication wiring | [django-auth](../django-auth/SKILL.md) |
 | Celery tasks, retries, periodic tasks, webhook dispatch | [django-celery](../django-celery/SKILL.md) |
+| Logging, request ids, error tracking, health and readiness checks, alerts | [django-observability](../django-observability/SKILL.md) |
+| Branch and pull request rules, CI, releases and tags, hotfix and rollback, feature flags, incident review | [django-release-governance](../django-release-governance/SKILL.md) |
 | Dockerfile, image build, container start command, health check | [django-docker-images](../django-docker-images/SKILL.md) |
 | Local docker compose stack: web, database, broker, workers, env files, container test commands | [django-docker-compose](../django-docker-compose/SKILL.md) |
 | Deploying to AWS: Fargate, App Runner or Elastic Beanstalk, production settings, health checks, migrations on release | [django-aws-deployment](../django-aws-deployment/SKILL.md) |

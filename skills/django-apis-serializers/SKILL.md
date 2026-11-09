@@ -23,6 +23,9 @@ Stance: APIs are frozen as thin interfaces: one APIView class per operation, val
 - Never rely on DRF's default permissions. Mechanism: with `DEFAULT_PERMISSION_CLASSES` unset DRF applies `AllowAny`, so a forgotten `permission_classes` leaves an endpoint open; fix is a restrictive global default.
 - Treat throttling as abuse control, not security. Mechanism: client IPs come from `X-Forwarded-For` or `REMOTE_ADDR` and can be spoofed, clients behind one NAT share a limit, and built-in throttles can admit a few extra requests under heavy concurrency; strict guarantees need a custom throttle or an upstream control.
 - Cap pagination (`max_limit`). Mechanism: an uncapped limit lets one request pull unbounded rows.
+- List response and request fields explicitly; never use `fields = "__all__"` or `exclude` on a serializer a client can reach. Mechanism: symptom is a new internal column appearing in the API the day a model gains it; cause is a serializer that follows the model; fix is an explicit field list, so adding a model field never changes the contract.
+- Never turn a blanket `except Exception` into a response or swallow an exception silently; catch the specific exception, or let the exception handler log it and return the contract's error. Mechanism: symptom is bugs that return 200 or a vague 400 and never reach error tracking; cause is a catch-all that hides the real failure; fix is narrow catches plus one handler.
+- Version the API from the first release that a client you cannot update will use, such as a mobile app. Mechanism: symptom is a contract change that breaks installed apps; cause is one unversioned path; fix is a version in the URL path.
 - Act only on what the user asked. Before answering or changing anything, open the relevant files and check what is already done; report only what you checked, never guess, and do not redo finished work. Reason: guesses and repeated work waste the user's credit.
 
 ## Agent dispatch
@@ -49,6 +52,8 @@ Before handling a request, follow the agent selection workflow in [django-api-ar
    - Permissions: set a restrictive global default in `REST_FRAMEWORK['DEFAULT_PERMISSION_CLASSES']` and override with `permission_classes` per API only where needed. Compose classes with `&`, `|` and `~` rather than writing new classes for simple combinations.
    - Object-level access: DRF's object permission checks do not run on list or create actions, so list access is enforced by the selector's user-scoped query and creates by the service. For detail APIs that fetch objects themselves, call `self.check_object_permissions(request, obj)` or rely on the user-scoped selector.
    - Throttling: use `ScopedRateThrottle` with a `throttle_scope` per API group and rates in `DEFAULT_THROTTLE_RATES`. Throttles use Django's cache; behind a proxy set `NUM_PROXIES` correctly.
+   - Versioning: set `DEFAULT_VERSIONING_CLASS` to `rest_framework.versioning.URLPathVersioning`, put `<version>` first in the URL (`v1/...`), and list `ALLOWED_VERSIONS` so an unreleased version returns 404 instead of working by accident. Per-view `allowed_versions` need a class-based API, which this house style already uses. Keep one version until a breaking change is real, and keep the old version running until installed clients have moved.
+   - If clients must branch on a failure, add a short stable `code` beside `detail` only where the project's contract allows it (DRF validation errors already carry codes); never make clients parse message text.
    - Document every endpoint with `@extend_schema` (tags, summary, request, responses including error codes).
 3. **Verify.** Endpoint tests pass; schema at `/api/schema/` renders; the response shape matches the error contract below.
 
